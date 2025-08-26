@@ -44,9 +44,9 @@ const (
 )
 
 type ErrUnexpectedToken struct {
-	Token Token
+	TokenID TokenID
 }
 
 func (e ErrUnexpectedToken) Error() string {
-	return ErrorPrefix + "unexpected token " + e.Token.ID().String()
+	return ErrorPrefix + "unexpected token " + e.TokenID.String()
 }

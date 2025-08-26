@@ -138,8 +138,7 @@ func (d *Decoder) ReadAll(buf []Token) ([]Token, error) {
 	var t Token
 	var err error
 	for {
-		err = d.ReadToken(&t)
-		if err != nil {
+		if err = d.ReadToken(&t); err != nil {
 			break
 		}
 		buf = append(buf, t)
@@ -151,11 +150,9 @@ func (d *Decoder) ReadAll(buf []Token) ([]Token, error) {
 }
 
 func (d *Decoder) SkipAll() error {
-	var t Token
 	var err error
 	for {
-		err = d.ReadToken(&t)
-		if err != nil {
+		if _, err = d.SkipToken(); err != nil {
 			break
 		}
 	}
@@ -166,32 +163,29 @@ func (d *Decoder) SkipAll() error {
 }
 
 func (d *Decoder) Value() (*Decoder, error) {
-	var t Token
-	if err := d.ReadToken(&t); err != nil {
+	id, err := d.SkipToken()
+	if err != nil {
 		return nil, err
 	}
-	if t.ID() != TokenOpen {
+	if id != TokenOpen {
 		return nil, &SyntacticError{
 			Offset: d.Offset(),
-			Err:    &ErrUnexpectedToken{t},
+			Err:    &ErrUnexpectedToken{id},
 		}
 	}
 	return &Decoder{s: d.s, minDepth: d.Depth()}, nil
 }
 
 func (d *Decoder) SkipValue() error {
-	var t Token
-	err := d.ReadToken(&t)
+	id, err := d.SkipToken()
 	if err != nil {
 		return err
-	}
-	if t.ID() != TokenOpen {
+	} else if id != TokenOpen {
 		return nil
 	}
-	val := &Decoder{s: d.s, minDepth: d.Depth()}
+	d = &Decoder{s: d.s, minDepth: d.Depth()}
 	for {
-		err = val.ReadToken(&t)
-		if err != nil {
+		if _, err = d.SkipToken(); err != nil {
 			break
 		}
 	}
