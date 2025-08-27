@@ -60,17 +60,18 @@ func Cast[U constraints.Integer, T constraints.Integer](a T) (U, bool) {
 	return b, false
 }
 
-func MinInt[T constraints.Signed]() (x T) {
-	size := unsafe.Sizeof(x) * 8
-	return -1 << (size - 1)
+func Min[T constraints.Integer]() T {
+	x := T(0) - 1
+	if x > 0 { // uint
+		return T(0)
+	}
+	return x << (unsafe.Sizeof(x)*8 - 1)
 }
 
-func MaxInt[T constraints.Signed]() (x T) {
-	size := unsafe.Sizeof(x) * 8
-	return 1<<(size-1) - 1
-}
-
-func MaxUint[T constraints.Unsigned]() (x T) {
-	size := unsafe.Sizeof(x) * 8
-	return 1<<size - 1
+func Max[T constraints.Integer]() T {
+	x := T(0) - 1
+	if x > 0 { // uint
+		return 1<<(unsafe.Sizeof(x)*8) - 1
+	}
+	return 1<<(unsafe.Sizeof(x)*8-1) - 1
 }
