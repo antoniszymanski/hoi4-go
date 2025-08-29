@@ -8,7 +8,7 @@ import (
 	"errors"
 	"math"
 
-	"github.com/antoniszymanski/hoi4-go/internal/checked"
+	"github.com/antoniszymanski/checked-go"
 )
 
 var (

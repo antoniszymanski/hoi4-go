@@ -1,3 +1,3 @@
 {
-  "conventionalCommits.scopes": ["hoi4", "hoi4text", "hoi4text", "internal", "internal/checked"]
+  "conventionalCommits.scopes": ["hoi4", "hoi4text", "hoi4text", "internal"]
 }

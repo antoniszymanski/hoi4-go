@@ -4,7 +4,7 @@
 //nolint:gosec // G115
 package hoi4date
 
-import "github.com/antoniszymanski/hoi4-go/internal/checked"
+import "github.com/antoniszymanski/checked-go"
 
 func FromBinary(in int32) (Date, error) {
 	None := func() (Date, error) { return Date{}, ErrInvalidBinaryDate(in) }
