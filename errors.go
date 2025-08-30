@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antoniszymanski/checked-go"
 	"github.com/antoniszymanski/hoi4-go/hoi4date"
 	"github.com/antoniszymanski/hoi4-go/hoi4text"
-	"github.com/antoniszymanski/hoi4-go/internal/checked"
 	"golang.org/x/exp/constraints"
 )
 
