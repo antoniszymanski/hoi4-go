@@ -17,8 +17,8 @@ func (t tokens) Get(id TokenID) string {
 }
 
 func (t tokens) Lookup(id TokenID) (string, bool) {
-	s, ok := t.m[id]
-	return s, ok
+	token, ok := t.m[id]
+	return token, ok
 }
 
 var Tokens tokens
