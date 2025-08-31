@@ -90,7 +90,7 @@ func Benchmark(b *testing.B) {
 			},
 		},
 	}
-	if reflect.DeepEqual(&actual, &expected) {
+	if !reflect.DeepEqual(&actual, &expected) {
 		b.Fatal(pp.Sprintf("Not equal:\nactual: %v\nexpected: %v", &actual, &expected))
 	}
 }
