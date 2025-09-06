@@ -3,7 +3,7 @@ module github.com/antoniszymanski/hoi4-go
 go 1.24.6
 
 require (
-	github.com/antoniszymanski/checked-go v0.0.0-20250830131900-25b3b010224a
+	github.com/antoniszymanski/checked-go v0.0.0-20250906192244-fd4bb4a4bc45
 	github.com/k0kubun/pp/v3 v3.5.0
 	golang.org/x/exp v0.0.0-20250819193227-8b4c13bb791b
 )

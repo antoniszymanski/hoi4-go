@@ -1,5 +1,5 @@
-github.com/antoniszymanski/checked-go v0.0.0-20250830131900-25b3b010224a h1:fNcseUuj+mtVVWiQyJdz7/4z9HadRBv/SOI3xESWotg=
-github.com/antoniszymanski/checked-go v0.0.0-20250830131900-25b3b010224a/go.mod h1:a7YBGPLpg6+UTn/u4Wovfj9XKcq3mdc+PnockOiNwXU=
+github.com/antoniszymanski/checked-go v0.0.0-20250906192244-fd4bb4a4bc45 h1:AwAU7d7TOJHFuA1rU6oN22cATPwJV5ySMMxxiuiO7fE=
+github.com/antoniszymanski/checked-go v0.0.0-20250906192244-fd4bb4a4bc45/go.mod h1:a7YBGPLpg6+UTn/u4Wovfj9XKcq3mdc+PnockOiNwXU=
 github.com/k0kubun/pp/v3 v3.5.0 h1:iYNlYA5HJAJvkD4ibuf9c8y6SHM0QFhaBuCqm1zHp0w=
 github.com/k0kubun/pp/v3 v3.5.0/go.mod h1:5lzno5ZZeEeTV/Ky6vs3g6d1U3WarDrH8k240vMtGro=
 github.com/mattn/go-colorable v0.1.14 h1:9A9LHSqF/7dyVVX6g0U9cwm9pG3kP9gSzcuIPHPsaIE=
