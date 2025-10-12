@@ -12,7 +12,6 @@ import (
 	"github.com/antoniszymanski/checked-go"
 	"github.com/antoniszymanski/hoi4-go/hoi4date"
 	"github.com/antoniszymanski/hoi4-go/hoi4text"
-	"golang.org/x/exp/constraints"
 )
 
 const ErrorPrefix = "hoi4: "
@@ -56,7 +55,7 @@ func (e ErrUnexpectedToken) Error() string {
 
 var ErrOutOfRange = errors.New(ErrorPrefix + "out of range")
 
-func cast[U, T constraints.Integer](a T) (U, error) {
+func cast[U, T checked.Integer](a T) (U, error) {
 	b, ok := checked.Cast[U](a)
 	if !ok {
 		return 0, ErrOutOfRange

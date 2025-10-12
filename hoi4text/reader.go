@@ -61,3 +61,10 @@ func read(r io.Reader, length int, buf []byte) ([]byte, error) {
 	}
 	return buf, nil
 }
+
+func resize[S ~[]E, E any](s S, length int) S {
+	if length <= cap(s) {
+		return s[:length]
+	}
+	return append(s[:cap(s)], make(S, length-cap(s))...)
+}

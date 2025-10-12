@@ -65,7 +65,7 @@ func (id TokenID) String() string {
 	default:
 		var b []byte
 		b = append(b, '<')
-		b = appendUint(b, id)
+		b = strconv.AppendUint(b, uint64(id), 10)
 		b = append(b, '>')
 		return internal.BytesToString(b)
 	}
@@ -244,11 +244,11 @@ func (t *Token) TextAppender(b []byte) ([]byte, error) {
 	case TokenEqual:
 		b = append(b, '=')
 	case TokenU32:
-		b = appendUint(b, t.U32())
+		b = strconv.AppendUint(b, uint64(t.U32()), 10)
 	case TokenU64:
-		b = appendUint(b, t.U64())
+		b = strconv.AppendUint(b, uint64(t.U64()), 10)
 	case TokenI32:
-		b = appendInt(b, t.I32())
+		b = strconv.AppendInt(b, int64(t.I32()), 10)
 	case TokenBool:
 		b = strconv.AppendBool(b, t.Bool())
 	case TokenQuoted:
@@ -256,14 +256,14 @@ func (t *Token) TextAppender(b []byte) ([]byte, error) {
 	case TokenUnquoted:
 		b = append(b, t.Unquoted()...)
 	case TokenF32:
-		b = appendFloat32(b, t.F32())
+		b = strconv.AppendFloat(b, float64(t.F32()), 'g', -1, 32)
 	case TokenF64:
-		b = appendFloat64(b, t.F64())
+		b = strconv.AppendFloat(b, t.F64(), 'g', -1, 64)
 	case TokenI64:
-		b = appendInt(b, t.I64())
+		b = strconv.AppendInt(b, t.I64(), 10)
 	default:
 		b = append(b, '<')
-		b = appendUint(b, t.id)
+		b = strconv.AppendUint(b, uint64(t.id), 10)
 		b = append(b, '>')
 	}
 	return b, err

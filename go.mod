@@ -5,7 +5,6 @@ go 1.24.6
 require (
 	github.com/antoniszymanski/checked-go v0.0.0-20250920163433-22affc75db69
 	github.com/k0kubun/pp/v3 v3.5.0
-	golang.org/x/exp v0.0.0-20251009144603-d2f985daa21b
 )
 
 require (
