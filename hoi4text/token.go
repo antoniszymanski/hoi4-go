@@ -4,7 +4,9 @@
 package hoi4text
 
 import (
+	"encoding"
 	"encoding/binary"
+	"fmt"
 	"math"
 	"strconv"
 
@@ -220,19 +222,25 @@ func (t *Token) putI64(v int64) {
 	t.data = binary.LittleEndian.AppendUint64(t.data[:0], uint64(v)) //#nosec G115
 }
 
+var (
+	_ fmt.Stringer           = Token{}
+	_ encoding.TextMarshaler = Token{}
+	_ encoding.TextAppender  = Token{}
+)
+
 func (t Token) String() string {
-	b, err := t.TextMarshaler()
+	b, err := t.MarshalText()
 	if err != nil {
 		return "<invalid token>"
 	}
 	return internal.BytesToString(b)
 }
 
-func (t *Token) TextMarshaler() ([]byte, error) {
-	return t.TextAppender(nil)
+func (t Token) MarshalText() ([]byte, error) {
+	return t.AppendText(nil)
 }
 
-func (t *Token) TextAppender(b []byte) ([]byte, error) {
+func (t Token) AppendText(b []byte) ([]byte, error) {
 	var err error
 	switch t.id {
 	case TokenInvalid:
