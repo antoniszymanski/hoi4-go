@@ -13,9 +13,24 @@ import (
 )
 
 type Token struct {
+	_    nonComparable
 	id   TokenID
 	data [8]byte
 	ptr  *byte
+}
+
+type nonComparable [0]func()
+
+func (t Token) Equal(other Token) bool {
+	if t.id != other.id {
+		return false
+	}
+	if t.id != TokenQuoted && t.id != TokenUnquoted {
+		return true
+	}
+	lengthA := binary.NativeEndian.Uint64(t.data[:])
+	lengthB := binary.NativeEndian.Uint64(other.data[:])
+	return unsafe.String(t.ptr, lengthA) == unsafe.String(other.ptr, lengthB)
 }
 
 func (t *Token) reset() {
