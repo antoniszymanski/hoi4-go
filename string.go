@@ -12,8 +12,7 @@ import (
 type String string
 
 func (x *String) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}

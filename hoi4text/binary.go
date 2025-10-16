@@ -7,8 +7,6 @@ import (
 	"encoding/binary"
 	"io"
 	"math"
-
-	"github.com/antoniszymanski/hoi4-go/internal"
 )
 
 type BinaryReader struct {
@@ -21,74 +19,73 @@ func (r *BinaryReader) Offset() uint64 {
 	return r.offset
 }
 
-func (r *BinaryReader) ReadToken(t *Token) error {
-	t.reset()
+func (r *BinaryReader) ReadToken() (Token, error) {
+	var t Token
 	id, err := r.readID()
 	if err != nil {
-		return err
+		return t, err
 	}
-
 	switch id {
 	case TokenOpen, TokenClose, TokenEqual:
 		t.putID(id)
 	case TokenU32:
 		v, err := r.readU32()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putU32(v)
 	case TokenU64:
 		v, err := r.readU64()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putU64(v)
 	case TokenI32:
 		v, err := r.readI32()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putI32(v)
 	case TokenBool:
 		v, err := r.readBool()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putBool(v)
 	case TokenQuoted:
 		v, err := r.readString()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putQuoted(v)
 	case TokenUnquoted:
 		v, err := r.readString()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putUnquoted(v)
 	case TokenF32:
 		v, err := r.readF32()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putF32(v)
 	case TokenF64:
 		v, err := r.readF64()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putF64(v)
 	case TokenI64:
 		v, err := r.readI64()
 		if err != nil {
-			return err
+			return t, err
 		}
 		t.putI64(v)
 	default:
 		t.putID(id)
 	}
-	return nil
+	return t, nil
 }
 
 func (r *BinaryReader) SkipToken() (TokenID, error) {
@@ -176,7 +173,7 @@ func (r *BinaryReader) readString() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return internal.BytesToString(b), nil
+	return string(b), nil
 }
 
 func (r *BinaryReader) readF32() (float32, error) {

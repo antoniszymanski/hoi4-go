@@ -16,7 +16,7 @@ func NewScanner(r Reader) *Scanner {
 }
 
 func (s *Scanner) Scan() bool {
-	s.err = s.r.ReadToken(&s.token)
+	s.token, s.err = s.r.ReadToken()
 	return s.err == nil
 }
 

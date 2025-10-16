@@ -5,12 +5,10 @@ package hoi4text
 
 import (
 	"io"
-
-	"github.com/antoniszymanski/hoi4-go/internal"
 )
 
 type Reader interface {
-	ReadToken(*Token) error
+	ReadToken() (Token, error)
 	Offset() uint64
 }
 
@@ -47,8 +45,8 @@ func SkipToken(r Reader) (TokenID, error) {
 	if s, ok := r.(Skipper); ok {
 		return s.SkipToken()
 	}
-	t := new(Token)
-	if err := r.ReadToken(internal.NoEscape(t)); err != nil {
+	t, err := r.ReadToken()
+	if err != nil {
 		return TokenInvalid, err
 	}
 	return t.ID(), nil

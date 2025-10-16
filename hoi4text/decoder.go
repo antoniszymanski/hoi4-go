@@ -13,28 +13,27 @@ type decoderState struct {
 	mode   uint8
 }
 
-func (d *decoderState) ReadToken(t *Token) error {
+func (d *decoderState) ReadToken() (Token, error) {
 	if len(d.buf) > 0 {
 		bt := d.buf[len(d.buf)-1]
-		*t = bt.token
-		d.offset = bt.offset
 		d.buf = d.buf[:len(d.buf)-1]
-		return nil
+		d.offset = bt.offset
+		return bt.token, nil
 	}
+	var t Token
 	var err error
 	switch d.mode {
 	case 0:
 		t.putID(TokenOpen)
 		d.mode = 1
 	case 1:
-		err = d.r.ReadToken(t)
+		t, err = d.r.ReadToken()
 		if err == io.EOF {
 			t.putID(TokenClose)
 			err = nil
 			d.mode = 2
 		}
 	case 2:
-		t.reset()
 		err = io.EOF
 	}
 	switch t.ID() {
@@ -44,7 +43,7 @@ func (d *decoderState) ReadToken(t *Token) error {
 		d.depth--
 	}
 	d.offset = d.r.Offset()
-	return err
+	return t, err
 }
 
 func (d *decoderState) SkipToken() (TokenID, error) {
@@ -102,20 +101,19 @@ func (d *Decoder) Depth() uint {
 	return d.s.depth
 }
 
-func (d *Decoder) ReadToken(t *Token) error {
+func (d *Decoder) ReadToken() (Token, error) {
 	if d.minDepth == 0 {
-		return d.s.ReadToken(t)
+		return d.s.ReadToken()
 	} else if d.endOfObject {
-		t.reset()
-		return ErrEndOfObject
+		return Token{}, ErrEndOfObject
 	}
-	err := d.s.ReadToken(t)
+	t, err := d.s.ReadToken()
 	if d.Depth() < d.minDepth {
 		d.endOfObject = true
 		t.reset()
 		err = ErrEndOfObject
 	}
-	return err
+	return t, err
 }
 
 func (d *Decoder) SkipToken() (TokenID, error) {
@@ -138,7 +136,8 @@ func (d *Decoder) ReadAll(buf []Token) ([]Token, error) {
 	var t Token
 	var err error
 	for {
-		if err = d.ReadToken(&t); err != nil {
+		t, err = d.ReadToken()
+		if err != nil {
 			break
 		}
 		buf = append(buf, t)
@@ -195,16 +194,16 @@ func (d *Decoder) SkipValue() error {
 	return nil
 }
 
-func (d *Decoder) Peek(noCopy bool) *Peeker {
-	return &Peeker{d: d.s, noCopy: noCopy}
+func (d *Decoder) Peek() *Peeker {
+	return &Peeker{d: d.s}
 }
 
 func (d *Decoder) PeekKind() (Kind, error) {
-	p := d.Peek(false)
+	p := d.Peek()
 	defer p.Close()
 
-	var t Token
-	if err := p.ReadToken(&t); err != nil {
+	t, err := p.ReadToken()
+	if err != nil {
 		return 0, err
 	}
 	if t.ID() != TokenOpen {
@@ -215,7 +214,8 @@ func (d *Decoder) PeekKind() (Kind, error) {
 		return 0, err
 	}
 
-	if err := p.ReadToken(&t); err != nil {
+	t, err = p.ReadToken()
+	if err != nil {
 		return 0, err
 	}
 	if t.ID() != TokenEqual {

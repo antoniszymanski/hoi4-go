@@ -5,8 +5,6 @@ package hoi4date
 
 import (
 	"strconv"
-
-	"github.com/antoniszymanski/hoi4-go/internal"
 )
 
 const ErrorPrefix = "hoi4date: "
@@ -23,5 +21,5 @@ func (e ErrInvalidBinaryDate) Error() string {
 	var b []byte
 	b = append(b, ErrorPrefix+"invalid binary date: "...)
 	b = strconv.AppendInt(b, int64(e), 10)
-	return internal.BytesToString(b)
+	return string(b)
 }

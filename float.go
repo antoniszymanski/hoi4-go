@@ -12,8 +12,7 @@ import (
 type Float32 float32
 
 func (x *Float32) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}
@@ -42,8 +41,7 @@ func (x *Float32) UnmarshalHOI4(dec *hoi4text.Decoder) error {
 type Float64 float64
 
 func (x *Float64) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}

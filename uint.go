@@ -12,8 +12,7 @@ import (
 type Uint uint
 
 func (x *Uint) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}
@@ -42,8 +41,7 @@ func (x *Uint) UnmarshalHOI4(dec *hoi4text.Decoder) error {
 type Uint8 uint8
 
 func (x *Uint8) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}
@@ -72,8 +70,7 @@ func (x *Uint8) UnmarshalHOI4(dec *hoi4text.Decoder) error {
 type Uint16 uint16
 
 func (x *Uint16) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}
@@ -102,8 +99,7 @@ func (x *Uint16) UnmarshalHOI4(dec *hoi4text.Decoder) error {
 type Uint32 uint32
 
 func (x *Uint32) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}
@@ -132,8 +128,7 @@ func (x *Uint32) UnmarshalHOI4(dec *hoi4text.Decoder) error {
 type Uint64 uint64
 
 func (x *Uint64) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	var t hoi4text.Token
-	err := dec.ReadToken(&t)
+	t, err := dec.ReadToken()
 	if err != nil {
 		return err
 	}
