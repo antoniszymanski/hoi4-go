@@ -37,7 +37,7 @@ func (t *Token) reset() {
 	t.putID(TokenInvalid)
 }
 
-func (t *Token) ID() TokenID {
+func (t Token) ID() TokenID {
 	return t.id
 }
 
@@ -46,7 +46,7 @@ func (t *Token) putID(v TokenID) {
 	t.ptr = nil
 }
 
-func (t *Token) U32() uint32 {
+func (t Token) U32() uint32 {
 	if t.id != TokenU32 {
 		panic("TokenID is not TokenU32")
 	}
@@ -58,7 +58,7 @@ func (t *Token) putU32(v uint32) {
 	binary.NativeEndian.PutUint32(t.data[:], v)
 }
 
-func (t *Token) U64() uint64 {
+func (t Token) U64() uint64 {
 	if t.id != TokenU64 {
 		panic("TokenID is not TokenU64")
 	}
@@ -70,7 +70,7 @@ func (t *Token) putU64(v uint64) {
 	binary.NativeEndian.PutUint64(t.data[:], v)
 }
 
-func (t *Token) I32() int32 {
+func (t Token) I32() int32 {
 	if t.id != TokenI32 {
 		panic("TokenID is not TokenI32")
 	}
@@ -82,7 +82,7 @@ func (t *Token) putI32(v int32) {
 	binary.NativeEndian.PutUint32(t.data[:], uint32(v)) //#nosec G115
 }
 
-func (t *Token) Bool() bool {
+func (t Token) Bool() bool {
 	if t.id != TokenBool {
 		panic("TokenID is not TokenBool")
 	}
@@ -98,7 +98,7 @@ func (t *Token) putBool(v bool) {
 	}
 }
 
-func (t *Token) Quoted() string {
+func (t Token) Quoted() string {
 	if t.id != TokenQuoted {
 		panic("TokenID is not TokenQuoted")
 	}
@@ -112,7 +112,7 @@ func (t *Token) putQuoted(v string) {
 	t.ptr = unsafe.StringData(v)
 }
 
-func (t *Token) Unquoted() string {
+func (t Token) Unquoted() string {
 	if t.id != TokenUnquoted {
 		panic("TokenID is not TokenUnquoted")
 	}
@@ -126,7 +126,7 @@ func (t *Token) putUnquoted(v string) {
 	t.ptr = unsafe.StringData(v)
 }
 
-func (t *Token) F32() float32 {
+func (t Token) F32() float32 {
 	if t.id != TokenF32 {
 		panic("TokenID is not TokenF32")
 	}
@@ -138,7 +138,7 @@ func (t *Token) putF32(v float32) {
 	binary.NativeEndian.PutUint32(t.data[:], math.Float32bits(v))
 }
 
-func (t *Token) F64() float64 {
+func (t Token) F64() float64 {
 	if t.id != TokenF64 {
 		panic("TokenID is not TokenF64")
 	}
@@ -150,7 +150,7 @@ func (t *Token) putF64(v float64) {
 	binary.NativeEndian.PutUint64(t.data[:], math.Float64bits(v))
 }
 
-func (t *Token) I64() int64 {
+func (t Token) I64() int64 {
 	if t.id != TokenI64 {
 		panic("TokenID is not TokenI64")
 	}
