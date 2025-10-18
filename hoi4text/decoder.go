@@ -24,12 +24,12 @@ func (d *decoderState) ReadToken() (Token, error) {
 	var err error
 	switch d.mode {
 	case 0:
-		t.putID(TokenOpen)
+		t = ID(TokenOpen)
 		d.mode = 1
 	case 1:
 		t, err = d.r.ReadToken()
 		if err == io.EOF {
-			t.putID(TokenClose)
+			t = ID(TokenClose)
 			err = nil
 			d.mode = 2
 		}
@@ -110,8 +110,7 @@ func (d *Decoder) ReadToken() (Token, error) {
 	t, err := d.s.ReadToken()
 	if d.Depth() < d.minDepth {
 		d.endOfObject = true
-		t.reset()
-		err = ErrEndOfObject
+		return Token{}, ErrEndOfObject
 	}
 	return t, err
 }

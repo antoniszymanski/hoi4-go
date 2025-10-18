@@ -27,63 +27,63 @@ func (r *BinaryReader) ReadToken() (Token, error) {
 	}
 	switch id {
 	case TokenOpen, TokenClose, TokenEqual:
-		t.putID(id)
+		t = ID(id)
 	case TokenU32:
 		v, err := r.readU32()
 		if err != nil {
 			return t, err
 		}
-		t.putU32(v)
+		t = U32(v)
 	case TokenU64:
 		v, err := r.readU64()
 		if err != nil {
 			return t, err
 		}
-		t.putU64(v)
+		t = U64(v)
 	case TokenI32:
 		v, err := r.readI32()
 		if err != nil {
 			return t, err
 		}
-		t.putI32(v)
+		t = I32(v)
 	case TokenBool:
 		v, err := r.readBool()
 		if err != nil {
 			return t, err
 		}
-		t.putBool(v)
+		t = Bool(v)
 	case TokenQuoted:
 		v, err := r.readString()
 		if err != nil {
 			return t, err
 		}
-		t.putQuoted(v)
+		t = Quoted(v)
 	case TokenUnquoted:
 		v, err := r.readString()
 		if err != nil {
 			return t, err
 		}
-		t.putUnquoted(v)
+		t = Unquoted(v)
 	case TokenF32:
 		v, err := r.readF32()
 		if err != nil {
 			return t, err
 		}
-		t.putF32(v)
+		t = F32(v)
 	case TokenF64:
 		v, err := r.readF64()
 		if err != nil {
 			return t, err
 		}
-		t.putF64(v)
+		t = F64(v)
 	case TokenI64:
 		v, err := r.readI64()
 		if err != nil {
 			return t, err
 		}
-		t.putI64(v)
+		t = I64(v)
 	default:
-		t.putID(id)
+		t = ID(id)
 	}
 	return t, nil
 }
