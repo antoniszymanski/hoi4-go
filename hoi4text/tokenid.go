@@ -4,6 +4,8 @@
 package hoi4text
 
 import (
+	"encoding"
+	"fmt"
 	"strconv"
 )
 
@@ -38,39 +40,53 @@ func (id TokenID) IsID() bool {
 	}
 }
 
+var (
+	_ fmt.Stringer           = TokenID(0)
+	_ encoding.TextMarshaler = TokenID(0)
+	_ encoding.TextAppender  = TokenID(0)
+)
+
 func (id TokenID) String() string {
+	b, _ := id.MarshalText()
+	return string(b)
+}
+
+func (id TokenID) MarshalText() ([]byte, error) {
+	return id.AppendText(nil)
+}
+
+func (id TokenID) AppendText(b []byte) ([]byte, error) {
 	switch id {
 	case TokenInvalid:
-		return "invalid"
+		b = append(b, "invalid"...)
 	case TokenOpen:
-		return "{"
+		b = append(b, '{')
 	case TokenClose:
-		return "}"
+		b = append(b, '}')
 	case TokenEqual:
-		return "="
+		b = append(b, '=')
 	case TokenU32:
-		return "u32"
+		b = append(b, "u32"...)
 	case TokenU64:
-		return "u64"
+		b = append(b, "u64"...)
 	case TokenI32:
-		return "i32"
+		b = append(b, "i32"...)
 	case TokenBool:
-		return "bool"
+		b = append(b, "bool"...)
 	case TokenQuoted:
-		return "quoted"
+		b = append(b, "quoted"...)
 	case TokenUnquoted:
-		return "unquoted"
+		b = append(b, "unquoted"...)
 	case TokenF32:
-		return "f32"
+		b = append(b, "f32"...)
 	case TokenF64:
-		return "f64"
+		b = append(b, "f64"...)
 	case TokenI64:
-		return "i64"
+		b = append(b, "i64"...)
 	default:
-		var b []byte
 		b = append(b, '<')
 		b = strconv.AppendUint(b, uint64(id), 10)
 		b = append(b, '>')
-		return string(b)
 	}
+	return b, nil
 }
