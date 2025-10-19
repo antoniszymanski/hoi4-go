@@ -25,12 +25,20 @@ func (t Token) Equal(other Token) bool {
 	if t.id != other.id {
 		return false
 	}
-	if t.id != TokenQuoted && t.id != TokenUnquoted {
+	switch t.id {
+	case TokenBool:
+		return (t.data[0] != 0) == (other.data[0] != 0)
+	case TokenU32, TokenI32, TokenF32:
+		return [4]byte(t.data[:4]) == [4]byte(other.data[:4])
+	case TokenU64, TokenI64, TokenF64:
+		return t.data == other.data
+	case TokenQuoted, TokenUnquoted:
+		t_len := binary.NativeEndian.Uint64(t.data[:])
+		other_len := binary.NativeEndian.Uint64(other.data[:])
+		return unsafe.String(t.ptr, t_len) == unsafe.String(other.ptr, other_len)
+	default:
 		return true
 	}
-	lengthA := binary.NativeEndian.Uint64(t.data[:])
-	lengthB := binary.NativeEndian.Uint64(other.data[:])
-	return unsafe.String(t.ptr, lengthA) == unsafe.String(other.ptr, lengthB)
 }
 
 func (t Token) ID() TokenID {
