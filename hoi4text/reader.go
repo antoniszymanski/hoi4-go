@@ -31,7 +31,7 @@ func NewReader(r io.Reader) (Reader, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	switch string(buf) { // does not allocate
+	switch string(buf) {
 	case HeaderBin:
 		return &BinaryReader{r: r, buf: buf}, nil
 	case HeaderTxt:
