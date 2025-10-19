@@ -20,8 +20,8 @@ func (s *Scanner) Scan() bool {
 	return s.err == nil
 }
 
-func (s *Scanner) Token() *Token {
-	return &s.token
+func (s *Scanner) Token() Token {
+	return s.token
 }
 
 func (s *Scanner) Err() error {
