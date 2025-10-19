@@ -45,8 +45,8 @@ func (t Token) ID() TokenID {
 	return t.id
 }
 
-func ID(v TokenID) Token {
-	return Token{id: v}
+func ID(id TokenID) Token {
+	return Token{id: id}
 }
 
 func (t Token) U32() uint32 {
@@ -56,9 +56,9 @@ func (t Token) U32() uint32 {
 	return binary.NativeEndian.Uint32(t.data[:])
 }
 
-func U32(v uint32) Token {
+func U32(i uint32) Token {
 	t := Token{id: TokenU32}
-	binary.NativeEndian.PutUint32(t.data[:], v)
+	binary.NativeEndian.PutUint32(t.data[:], i)
 	return t
 }
 
@@ -69,9 +69,9 @@ func (t Token) U64() uint64 {
 	return binary.NativeEndian.Uint64(t.data[:])
 }
 
-func U64(v uint64) Token {
+func U64(i uint64) Token {
 	t := Token{id: TokenU64}
-	binary.NativeEndian.PutUint64(t.data[:], v)
+	binary.NativeEndian.PutUint64(t.data[:], i)
 	return t
 }
 
@@ -82,9 +82,9 @@ func (t Token) I32() int32 {
 	return int32(binary.NativeEndian.Uint32(t.data[:])) //#nosec G115
 }
 
-func I32(v int32) Token {
+func I32(i int32) Token {
 	t := Token{id: TokenI32}
-	binary.NativeEndian.PutUint32(t.data[:], uint32(v)) //#nosec G115
+	binary.NativeEndian.PutUint32(t.data[:], uint32(i)) //#nosec G115
 	return t
 }
 
@@ -95,9 +95,9 @@ func (t Token) Bool() bool {
 	return t.data[0] != 0
 }
 
-func Bool(v bool) Token {
+func Bool(b bool) Token {
 	t := Token{id: TokenBool}
-	if v {
+	if b {
 		t.data[0] = 1
 	}
 	return t
@@ -111,9 +111,9 @@ func (t Token) Quoted() string {
 	return unsafe.String(t.ptr, length)
 }
 
-func Quoted(v string) Token {
-	t := Token{id: TokenQuoted, ptr: unsafe.StringData(v)}
-	binary.NativeEndian.PutUint64(t.data[:], uint64(len(v)))
+func Quoted(s string) Token {
+	t := Token{id: TokenQuoted, ptr: unsafe.StringData(s)}
+	binary.NativeEndian.PutUint64(t.data[:], uint64(len(s)))
 	return t
 }
 
@@ -125,9 +125,9 @@ func (t Token) Unquoted() string {
 	return unsafe.String(t.ptr, length)
 }
 
-func Unquoted(v string) Token {
-	t := Token{id: TokenUnquoted, ptr: unsafe.StringData(v)}
-	binary.NativeEndian.PutUint64(t.data[:], uint64(len(v)))
+func Unquoted(s string) Token {
+	t := Token{id: TokenUnquoted, ptr: unsafe.StringData(s)}
+	binary.NativeEndian.PutUint64(t.data[:], uint64(len(s)))
 	return t
 }
 
@@ -138,9 +138,9 @@ func (t Token) F32() float32 {
 	return math.Float32frombits(binary.NativeEndian.Uint32(t.data[:]))
 }
 
-func F32(v float32) Token {
+func F32(f float32) Token {
 	t := Token{id: TokenF32}
-	binary.NativeEndian.PutUint32(t.data[:], math.Float32bits(v))
+	binary.NativeEndian.PutUint32(t.data[:], math.Float32bits(f))
 	return t
 }
 
@@ -151,9 +151,9 @@ func (t Token) F64() float64 {
 	return math.Float64frombits(binary.NativeEndian.Uint64(t.data[:]))
 }
 
-func F64(v float64) Token {
+func F64(f float64) Token {
 	t := Token{id: TokenF64}
-	binary.NativeEndian.PutUint64(t.data[:], math.Float64bits(v))
+	binary.NativeEndian.PutUint64(t.data[:], math.Float64bits(f))
 	return t
 }
 
@@ -164,9 +164,9 @@ func (t Token) I64() int64 {
 	return int64(binary.NativeEndian.Uint64(t.data[:])) //#nosec G115
 }
 
-func I64(v int64) Token {
+func I64(i int64) Token {
 	t := Token{id: TokenI64}
-	binary.NativeEndian.PutUint64(t.data[:], uint64(v)) //#nosec G115
+	binary.NativeEndian.PutUint64(t.data[:], uint64(i)) //#nosec G115
 	return t
 }
 
