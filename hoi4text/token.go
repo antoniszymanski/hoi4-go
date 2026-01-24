@@ -29,15 +29,17 @@ func (t Token) Equal(other Token) bool {
 	}
 	switch t.id {
 	case TokenBool:
-		return (t.data[0] != 0) == (other.data[0] != 0)
-	case TokenU32, TokenI32, TokenF32:
+		return t.getBool() == other.getBool()
+	case TokenU32, TokenI32:
 		return [4]byte(t.data[:4]) == [4]byte(other.data[:4])
-	case TokenU64, TokenI64, TokenF64:
+	case TokenF32:
+		return t.getF32() == other.getF32()
+	case TokenU64, TokenI64:
 		return t.data == other.data
+	case TokenF64:
+		return t.getF64() == other.getF64()
 	case TokenQuoted, TokenUnquoted:
-		t_len := binary.NativeEndian.Uint64(t.data[:])
-		other_len := binary.NativeEndian.Uint64(other.data[:])
-		return unsafe.String(t.ptr, t_len) == unsafe.String(other.ptr, other_len)
+		return t.getString() == other.getString()
 	default:
 		return true
 	}
@@ -280,7 +282,7 @@ func (t Token) AppendText(b []byte) ([]byte, error) {
 	case TokenU32:
 		b = strconv.AppendUint(b, uint64(t.U32()), 10)
 	case TokenU64:
-		b = strconv.AppendUint(b, uint64(t.U64()), 10)
+		b = strconv.AppendUint(b, t.U64(), 10)
 	case TokenI32:
 		b = strconv.AppendInt(b, int64(t.I32()), 10)
 	case TokenBool:
