@@ -41,19 +41,114 @@ func (t Token) Equal(other Token) bool {
 	}
 }
 
+// #region Getters
+
 func (t Token) ID() TokenID {
 	return t.id
-}
-
-func ID(id TokenID) Token {
-	return Token{id: id}
 }
 
 func (t Token) U32() uint32 {
 	if t.id != TokenU32 {
 		panic("TokenID is not TokenU32")
 	}
+	return t.getU32()
+}
+
+func (t Token) getU32() uint32 {
 	return binary.NativeEndian.Uint32(t.data[:])
+}
+
+func (t Token) U64() uint64 {
+	if t.id != TokenU64 {
+		panic("TokenID is not TokenU64")
+	}
+	return t.getU64()
+}
+
+func (t Token) getU64() uint64 {
+	return binary.NativeEndian.Uint64(t.data[:])
+}
+
+func (t Token) I32() int32 {
+	if t.id != TokenI32 {
+		panic("TokenID is not TokenI32")
+	}
+	return t.getI32()
+}
+
+func (t Token) getI32() int32 {
+	return int32(t.getU32()) //#nosec G115
+}
+
+func (t Token) Bool() bool {
+	if t.id != TokenBool {
+		panic("TokenID is not TokenBool")
+	}
+	return t.getBool()
+}
+
+func (t Token) getBool() bool {
+	return t.data[0] != 0
+}
+
+func (t Token) Quoted() string {
+	if t.id != TokenQuoted {
+		panic("TokenID is not TokenQuoted")
+	}
+	return t.getString()
+}
+
+func (t Token) Unquoted() string {
+	if t.id != TokenUnquoted {
+		panic("TokenID is not TokenUnquoted")
+	}
+	return t.getString()
+}
+
+func (t Token) getString() string {
+	length := binary.NativeEndian.Uint64(t.data[:])
+	return unsafe.String(t.ptr, length)
+}
+
+func (t Token) F32() float32 {
+	if t.id != TokenF32 {
+		panic("TokenID is not TokenF32")
+	}
+	return t.getF32()
+}
+
+func (t Token) getF32() float32 {
+	return math.Float32frombits(binary.NativeEndian.Uint32(t.data[:]))
+}
+
+func (t Token) F64() float64 {
+	if t.id != TokenF64 {
+		panic("TokenID is not TokenF64")
+	}
+	return t.getF64()
+}
+
+func (t Token) getF64() float64 {
+	return math.Float64frombits(binary.NativeEndian.Uint64(t.data[:]))
+}
+
+func (t Token) I64() int64 {
+	if t.id != TokenI64 {
+		panic("TokenID is not TokenI64")
+	}
+	return t.getI64()
+}
+
+func (t Token) getI64() int64 {
+	return int64(t.getU64()) //#nosec G115
+}
+
+// #endregion
+
+// #region Constructors
+
+func ID(id TokenID) Token {
+	return Token{id: id}
 }
 
 func U32(i uint32) Token {
@@ -62,37 +157,16 @@ func U32(i uint32) Token {
 	return t
 }
 
-func (t Token) U64() uint64 {
-	if t.id != TokenU64 {
-		panic("TokenID is not TokenU64")
-	}
-	return binary.NativeEndian.Uint64(t.data[:])
-}
-
 func U64(i uint64) Token {
 	t := Token{id: TokenU64}
 	binary.NativeEndian.PutUint64(t.data[:], i)
 	return t
 }
 
-func (t Token) I32() int32 {
-	if t.id != TokenI32 {
-		panic("TokenID is not TokenI32")
-	}
-	return int32(binary.NativeEndian.Uint32(t.data[:])) //#nosec G115
-}
-
 func I32(i int32) Token {
 	t := Token{id: TokenI32}
 	binary.NativeEndian.PutUint32(t.data[:], uint32(i)) //#nosec G115
 	return t
-}
-
-func (t Token) Bool() bool {
-	if t.id != TokenBool {
-		panic("TokenID is not TokenBool")
-	}
-	return t.data[0] != 0
 }
 
 func Bool(b bool) Token {
@@ -103,26 +177,10 @@ func Bool(b bool) Token {
 	return t
 }
 
-func (t Token) Quoted() string {
-	if t.id != TokenQuoted {
-		panic("TokenID is not TokenQuoted")
-	}
-	length := binary.NativeEndian.Uint64(t.data[:])
-	return unsafe.String(t.ptr, length)
-}
-
 func Quoted(s string) Token {
 	t := Token{id: TokenQuoted, ptr: unsafe.StringData(s)}
 	binary.NativeEndian.PutUint64(t.data[:], uint64(len(s)))
 	return t
-}
-
-func (t Token) Unquoted() string {
-	if t.id != TokenUnquoted {
-		panic("TokenID is not TokenUnquoted")
-	}
-	length := binary.NativeEndian.Uint64(t.data[:])
-	return unsafe.String(t.ptr, length)
 }
 
 func Unquoted(s string) Token {
@@ -131,24 +189,10 @@ func Unquoted(s string) Token {
 	return t
 }
 
-func (t Token) F32() float32 {
-	if t.id != TokenF32 {
-		panic("TokenID is not TokenF32")
-	}
-	return math.Float32frombits(binary.NativeEndian.Uint32(t.data[:]))
-}
-
 func F32(f float32) Token {
 	t := Token{id: TokenF32}
 	binary.NativeEndian.PutUint32(t.data[:], math.Float32bits(f))
 	return t
-}
-
-func (t Token) F64() float64 {
-	if t.id != TokenF64 {
-		panic("TokenID is not TokenF64")
-	}
-	return math.Float64frombits(binary.NativeEndian.Uint64(t.data[:]))
 }
 
 func F64(f float64) Token {
@@ -157,18 +201,13 @@ func F64(f float64) Token {
 	return t
 }
 
-func (t Token) I64() int64 {
-	if t.id != TokenI64 {
-		panic("TokenID is not TokenI64")
-	}
-	return int64(binary.NativeEndian.Uint64(t.data[:])) //#nosec G115
-}
-
 func I64(i int64) Token {
 	t := Token{id: TokenI64}
 	binary.NativeEndian.PutUint64(t.data[:], uint64(i)) //#nosec G115
 	return t
 }
+
+// #endregion
 
 var (
 	_ fmt.Stringer           = Token{}
