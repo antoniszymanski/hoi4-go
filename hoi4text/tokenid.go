@@ -40,6 +40,21 @@ func (id TokenID) IsID() bool {
 	}
 }
 
+func (id TokenID) Compare(other TokenID) int {
+	switch {
+	case id == other:
+		return 0
+	case id == TokenInvalid:
+		return +1
+	case other == TokenInvalid:
+		return -1
+	case id < other:
+		return -1
+	default: // id > other
+		return +1
+	}
+}
+
 var (
 	_ fmt.Stringer           = TokenID(0)
 	_ encoding.TextMarshaler = TokenID(0)

@@ -4,11 +4,13 @@
 package hoi4text
 
 import (
+	"cmp"
 	"encoding"
 	"encoding/binary"
 	"fmt"
 	"math"
 	"strconv"
+	"strings"
 	"unsafe"
 )
 
@@ -38,6 +40,43 @@ func (t Token) Equal(other Token) bool {
 		return unsafe.String(t.ptr, t_len) == unsafe.String(other.ptr, other_len)
 	default:
 		return true
+	}
+}
+
+func (t Token) Compare(other Token) int {
+	if t.id != other.id {
+		return t.id.Compare(other.id)
+	}
+	switch t.id {
+	case TokenBool:
+		return compareBool(t.getBool(), other.getBool())
+	case TokenU32:
+		return cmp.Compare(t.getU32(), other.getU32())
+	case TokenI32:
+		return cmp.Compare(t.getI32(), other.getI32())
+	case TokenF32:
+		return cmp.Compare(t.getF32(), other.getF32())
+	case TokenU64:
+		return cmp.Compare(t.getU64(), other.getU64())
+	case TokenI64:
+		return cmp.Compare(t.getI64(), other.getI64())
+	case TokenF64:
+		return cmp.Compare(t.getF64(), other.getF64())
+	case TokenQuoted, TokenUnquoted:
+		return strings.Compare(t.getString(), other.getString())
+	default:
+		return 0
+	}
+}
+
+func compareBool(x, y bool) int {
+	switch {
+	case x == y:
+		return 0
+	case !x && y: // false < true
+		return -1
+	default: // true > false
+		return +1
 	}
 }
 
