@@ -6,30 +6,29 @@ package hoi4date
 
 import "github.com/antoniszymanski/checked-go"
 
-func FromBinary(in int32) (Date, error) {
-	None := func() (Date, error) { return Date{}, ErrInvalidBinaryDate(in) }
-	Some := func(d Date) (Date, error) {
+func FromBinary(x int32) (Date, bool) {
+	None := func() (Date, bool) { return Date{}, false }
+	Some := func(d Date) (Date, bool) {
 		if !d.IsValid() {
 			return None()
 		}
-		return d, nil
+		return d, true
 	}
-	s := in
 
-	hour := s % 24
-	s /= 24
+	hour := x % 24
+	x /= 24
 
-	days_since_jan1 := s % 365
+	days_since_jan1 := x % 365
 	if hour < 0 || days_since_jan1 < 0 {
 		return None()
 	}
 
-	s /= 365
-	s, ok := checked.Sub(s, 5000)
+	x /= 365
+	x, ok := checked.Sub(x, 5000)
 	if !ok {
 		return None()
 	}
-	year, ok := checked.Cast[int16](s)
+	year, ok := checked.Cast[int16](x)
 	if !ok {
 		return None()
 	}

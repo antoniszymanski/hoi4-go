@@ -5,21 +5,20 @@ package hoi4date
 
 import "github.com/antoniszymanski/checked-go"
 
-func FromString(in string) (Date, error) {
-	None := func() (Date, error) { return Date{}, ErrInvalidDate(in) }
-	Some := func(d Date) (Date, error) {
+func FromString(x string) (Date, bool) {
+	None := func() (Date, bool) { return Date{}, false }
+	Some := func(d Date) (Date, bool) {
 		if !d.IsValid() {
 			return None()
 		}
-		return d, nil
+		return d, true
 	}
-	data := in
 
-	i, data, err := to_i64_t(data)
+	i, x, err := to_i64_t(x)
 	if err != nil {
 		return None()
 	}
-	if data == "" {
+	if x == "" {
 		year, ok := checked.Cast[int32](i)
 		if !ok {
 			return None()
@@ -31,14 +30,14 @@ func FromString(in string) (Date, error) {
 	if !ok {
 		return None()
 	}
-	if data == "" || data[0] != '.' {
+	if x == "" || x[0] != '.' {
 		return None()
 	}
 
-	if len(data) < 1 {
+	if len(x) < 1 {
 		return None()
 	}
-	n := data[1]
+	n := x[1]
 	var month1 uint8
 	if !is_ascii_digit(n) {
 		return None()
@@ -46,10 +45,10 @@ func FromString(in string) (Date, error) {
 		month1 = n - '0'
 	}
 
-	if len(data) < 2 {
+	if len(x) < 2 {
 		return None()
 	}
-	n = data[2]
+	n = x[2]
 	month, offset := uint8(0), uint(0)
 	switch {
 	case n == '.':
@@ -60,17 +59,17 @@ func FromString(in string) (Date, error) {
 		return None()
 	}
 
-	if uint(len(data)) < offset {
+	if uint(len(x)) < offset {
 		return None()
 	}
-	if data[offset] != '.' {
+	if x[offset] != '.' {
 		return None()
 	}
 
-	if uint(len(data)) < offset+1 {
+	if uint(len(x)) < offset+1 {
 		return None()
 	}
-	n = data[offset+1]
+	n = x[offset+1]
 	var day1 uint8
 	if !is_ascii_digit(n) {
 		return None()
@@ -78,18 +77,18 @@ func FromString(in string) (Date, error) {
 		day1 = n - '0'
 	}
 
-	if uint(len(data)) < offset+2 {
+	if uint(len(x)) < offset+2 {
 		return Some(Date{year, month, day1, 0})
 	}
 	var day uint8
-	switch data[offset+2] {
+	switch x[offset+2] {
 	case '.':
 		day, offset = day1, offset+2
 	default:
-		n := data[offset+2]
+		n := x[offset+2]
 		if is_ascii_digit(n) {
 			result := day1*10 + (n - '0')
-			if uint(len(data)) != offset+3 {
+			if uint(len(x)) != offset+3 {
 				day, offset = result, offset+3
 			} else {
 				return Some(Date{year, month, result, 0})
@@ -99,17 +98,17 @@ func FromString(in string) (Date, error) {
 		}
 	}
 
-	if uint(len(data)) < offset {
+	if uint(len(x)) < offset {
 		return None()
 	}
-	if data[offset] != '.' {
+	if x[offset] != '.' {
 		return None()
 	}
 
-	if uint(len(data)) < offset+1 {
+	if uint(len(x)) < offset+1 {
 		return None()
 	}
-	n = data[offset+1]
+	n = x[offset+1]
 	var hour1 uint8
 	if !is_ascii_digit(n) || n == '0' {
 		return None()
@@ -117,13 +116,13 @@ func FromString(in string) (Date, error) {
 		hour1 = n - '0'
 	}
 
-	if uint(len(data)) < offset+2 {
+	if uint(len(x)) < offset+2 {
 		return Some(Date{year, month, day, hour1})
 	}
-	n = data[offset+2]
+	n = x[offset+2]
 	if is_ascii_digit(n) {
 		result := hour1*10 + (n - '0')
-		if uint(len(data)) != offset+3 {
+		if uint(len(x)) != offset+3 {
 			return None()
 		} else {
 			return Some(Date{year, month, day, result})
