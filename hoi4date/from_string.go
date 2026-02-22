@@ -6,47 +6,39 @@ package hoi4date
 import "github.com/antoniszymanski/checked-go"
 
 func FromString(x string) (Date, bool) {
-	None := func() (Date, bool) { return Date{}, false }
-	Some := func(d Date) (Date, bool) {
-		if !d.IsValid() {
-			return None()
-		}
-		return d, true
-	}
-
 	i, x, err := to_i64_t(x)
 	if err != nil {
-		return None()
+		return none()
 	}
 	if x == "" {
 		year, ok := checked.Cast[int32](i)
 		if !ok {
-			return None()
+			return none()
 		}
 		return FromBinary(year)
 	}
 
 	year, ok := checked.Cast[int16](i)
 	if !ok {
-		return None()
+		return none()
 	}
 	if x == "" || x[0] != '.' {
-		return None()
+		return none()
 	}
 
 	if len(x) < 1 {
-		return None()
+		return none()
 	}
 	n := x[1]
 	var month1 uint8
 	if !is_ascii_digit(n) {
-		return None()
+		return none()
 	} else {
 		month1 = n - '0'
 	}
 
 	if len(x) < 2 {
-		return None()
+		return none()
 	}
 	n = x[2]
 	month, offset := uint8(0), uint(0)
@@ -56,29 +48,29 @@ func FromString(x string) (Date, bool) {
 	case is_ascii_digit(n):
 		month, offset = month1*10+(n-'0'), 3
 	default:
-		return None()
+		return none()
 	}
 
 	if uint(len(x)) < offset {
-		return None()
+		return none()
 	}
 	if x[offset] != '.' {
-		return None()
+		return none()
 	}
 
 	if uint(len(x)) < offset+1 {
-		return None()
+		return none()
 	}
 	n = x[offset+1]
 	var day1 uint8
 	if !is_ascii_digit(n) {
-		return None()
+		return none()
 	} else {
 		day1 = n - '0'
 	}
 
 	if uint(len(x)) < offset+2 {
-		return Some(Date{year, month, day1, 0})
+		return some(year, month, day1, 0)
 	}
 	var day uint8
 	switch x[offset+2] {
@@ -91,43 +83,43 @@ func FromString(x string) (Date, bool) {
 			if uint(len(x)) != offset+3 {
 				day, offset = result, offset+3
 			} else {
-				return Some(Date{year, month, result, 0})
+				return some(year, month, result, 0)
 			}
 		} else {
-			return None()
+			return none()
 		}
 	}
 
 	if uint(len(x)) < offset {
-		return None()
+		return none()
 	}
 	if x[offset] != '.' {
-		return None()
+		return none()
 	}
 
 	if uint(len(x)) < offset+1 {
-		return None()
+		return none()
 	}
 	n = x[offset+1]
 	var hour1 uint8
 	if !is_ascii_digit(n) || n == '0' {
-		return None()
+		return none()
 	} else {
 		hour1 = n - '0'
 	}
 
 	if uint(len(x)) < offset+2 {
-		return Some(Date{year, month, day, hour1})
+		return some(year, month, day, hour1)
 	}
 	n = x[offset+2]
 	if is_ascii_digit(n) {
 		result := hour1*10 + (n - '0')
 		if uint(len(x)) != offset+3 {
-			return None()
+			return none()
 		} else {
-			return Some(Date{year, month, day, result})
+			return some(year, month, day, result)
 		}
 	} else {
-		return None()
+		return none()
 	}
 }

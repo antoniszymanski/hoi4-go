@@ -6,10 +6,8 @@ package hoi4date
 import "fmt"
 
 type Date struct {
-	Year  int16
-	Month uint8
-	Day   uint8
-	Hour  uint8
+	Year             int16
+	Month, Day, Hour uint8
 }
 
 func (d Date) IsValid() bool {

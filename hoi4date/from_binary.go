@@ -7,33 +7,25 @@ package hoi4date
 import "github.com/antoniszymanski/checked-go"
 
 func FromBinary(x int32) (Date, bool) {
-	None := func() (Date, bool) { return Date{}, false }
-	Some := func(d Date) (Date, bool) {
-		if !d.IsValid() {
-			return None()
-		}
-		return d, true
-	}
-
 	hour := x % 24
 	x /= 24
 
 	days_since_jan1 := x % 365
 	if hour < 0 || days_since_jan1 < 0 {
-		return None()
+		return none()
 	}
 
 	x /= 365
 	x, ok := checked.Sub(x, 5000)
 	if !ok {
-		return None()
+		return none()
 	}
 	year, ok := checked.Cast[int16](x)
 	if !ok {
-		return None()
+		return none()
 	}
 	month, day := month_day_from_julian(days_since_jan1)
-	return Some(Date{year, month, day, uint8(hour) + 1})
+	return some(year, month, day, uint8(hour)+1)
 }
 
 func month_day_from_julian(days_since_jan1 int32) (month, day uint8) {
