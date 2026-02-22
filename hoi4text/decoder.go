@@ -160,7 +160,7 @@ func (d *Decoder) SkipAll() error {
 	return nil
 }
 
-func (d *Decoder) Value() (*Decoder, error) {
+func (d *Decoder) Container() (*Decoder, error) {
 	id, err := d.SkipToken()
 	if err != nil {
 		return nil, err
@@ -206,7 +206,7 @@ func (d *Decoder) PeekKind() (Kind, error) {
 		return 0, err
 	}
 	if t.ID() != TokenOpen {
-		return KindValue, nil
+		return KindScalar, nil
 	}
 
 	if _, err := p.SkipToken(); err != nil {
@@ -220,30 +220,30 @@ func (d *Decoder) PeekKind() (Kind, error) {
 	if t.ID() != TokenEqual {
 		return KindArray, nil
 	} else {
-		return KindMap, nil
+		return KindObject, nil
 	}
 }
 
 type Kind uint8
 
 const (
-	KindValue Kind = iota + 1
+	KindScalar Kind = iota + 1
 	KindArray
-	KindMap
+	KindObject
 )
 
-func (k Kind) IsObject() bool {
-	return k == KindArray || k == KindMap
+func (k Kind) IsContainer() bool {
+	return k == KindArray || k == KindObject
 }
 
 func (k Kind) String() string {
 	switch k {
-	case KindValue:
-		return "value"
+	case KindScalar:
+		return "scalar"
 	case KindArray:
 		return "array"
-	case KindMap:
-		return "map"
+	case KindObject:
+		return "object"
 	default:
 		return "invalid"
 	}
