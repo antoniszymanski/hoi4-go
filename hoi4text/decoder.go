@@ -124,8 +124,7 @@ func (d *Decoder) SkipToken() (TokenID, error) {
 	id, err := d.s.SkipToken()
 	if d.Depth() < d.minDepth {
 		d.endOfObject = true
-		id = TokenInvalid
-		err = ErrEndOfObject
+		return TokenInvalid, ErrEndOfObject
 	}
 	return id, err
 }
