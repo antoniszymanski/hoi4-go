@@ -27,7 +27,7 @@ func FromString(x string) (Date, bool) {
 		return none()
 	}
 
-	if len(x) < 1 {
+	if len(x) <= 1 {
 		return none()
 	}
 	n := x[1]
@@ -38,7 +38,7 @@ func FromString(x string) (Date, bool) {
 		month1 = n - '0'
 	}
 
-	if len(x) < 2 {
+	if len(x) <= 2 {
 		return none()
 	}
 	n = x[2]
@@ -52,14 +52,14 @@ func FromString(x string) (Date, bool) {
 		return none()
 	}
 
-	if uint(len(x)) < offset {
+	if uint(len(x)) <= offset {
 		return none()
 	}
 	if x[offset] != '.' {
 		return none()
 	}
 
-	if uint(len(x)) < offset+1 {
+	if uint(len(x)) <= offset+1 {
 		return none()
 	}
 	n = x[offset+1]
@@ -70,7 +70,7 @@ func FromString(x string) (Date, bool) {
 		day1 = n - '0'
 	}
 
-	if uint(len(x)) < offset+2 {
+	if uint(len(x)) <= offset+2 {
 		return some(year, month, day1, 0)
 	}
 	var day uint8
@@ -91,14 +91,14 @@ func FromString(x string) (Date, bool) {
 		}
 	}
 
-	if uint(len(x)) < offset {
+	if uint(len(x)) <= offset {
 		return none()
 	}
 	if x[offset] != '.' {
 		return none()
 	}
 
-	if uint(len(x)) < offset+1 {
+	if uint(len(x)) <= offset+1 {
 		return none()
 	}
 	n = x[offset+1]
@@ -109,7 +109,7 @@ func FromString(x string) (Date, bool) {
 		hour1 = n - '0'
 	}
 
-	if uint(len(x)) < offset+2 {
+	if uint(len(x)) <= offset+2 {
 		return some(year, month, day, hour1)
 	}
 	n = x[offset+2]
