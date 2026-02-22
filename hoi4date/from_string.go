@@ -6,7 +6,7 @@ package hoi4date
 
 import "github.com/antoniszymanski/checked-go"
 
-func FromString(data string) (Date, bool) {
+func Parse(data string) (Date, bool) {
 	i, data, ok := toInt64(data)
 	if !ok {
 		return none()
@@ -16,7 +16,7 @@ func FromString(data string) (Date, bool) {
 		if !ok {
 			return none()
 		}
-		return FromBinary(binary)
+		return ParseBinary(binary)
 	}
 
 	year, ok := checked.Cast[int16](i)

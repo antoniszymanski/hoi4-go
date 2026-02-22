@@ -7,21 +7,21 @@ package hoi4date
 
 import "github.com/antoniszymanski/checked-go"
 
-func FromBinary(x int32) (Date, bool) {
-	hour := x % 24
-	x /= 24
+func ParseBinary(data int32) (Date, bool) {
+	hour := data % 24
+	data /= 24
 
-	daysSinceJan1 := x % 365
+	daysSinceJan1 := data % 365
 	if hour < 0 || daysSinceJan1 < 0 {
 		return none()
 	}
 
-	x /= 365
-	x, ok := checked.Sub(x, 5000)
+	data /= 365
+	data, ok := checked.Sub(data, 5000)
 	if !ok {
 		return none()
 	}
-	year, ok := checked.Cast[int16](x)
+	year, ok := checked.Cast[int16](data)
 	if !ok {
 		return none()
 	}

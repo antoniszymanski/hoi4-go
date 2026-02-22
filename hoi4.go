@@ -101,12 +101,12 @@ func unmarshalDate(dec *hoi4text.Decoder, out reflect.Value) error {
 	var ok bool
 	switch t.ID() {
 	case hoi4text.TokenI32:
-		x, ok = hoi4date.FromBinary(t.I32())
+		x, ok = hoi4date.ParseBinary(t.I32())
 		if !ok {
 			return &UnmarshalDateError[int32]{t.I32()}
 		}
 	case hoi4text.TokenQuoted:
-		x, ok = hoi4date.FromString(t.Quoted())
+		x, ok = hoi4date.Parse(t.Quoted())
 		if !ok {
 			return &UnmarshalDateError[string]{t.Quoted()}
 		}
