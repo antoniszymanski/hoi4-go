@@ -160,16 +160,6 @@ func (d *Decoder) SkipAll() error {
 	return nil
 }
 
-func (d *Decoder) EnterContainer() (*Decoder, error) {
-	id, err := d.SkipToken()
-	if err != nil {
-		return nil, err
-	} else if id != TokenOpen {
-		return nil, &NotAContainerError{d.Offset(), id}
-	}
-	return &Decoder{s: d.s, minDepth: d.Depth()}, nil
-}
-
 func (d *Decoder) SkipValue() error {
 	id, err := d.SkipToken()
 	if err != nil {
@@ -179,6 +169,16 @@ func (d *Decoder) SkipValue() error {
 	}
 	d = &Decoder{s: d.s, minDepth: d.Depth()}
 	return d.SkipAll()
+}
+
+func (d *Decoder) EnterContainer() (*Decoder, error) {
+	id, err := d.SkipToken()
+	if err != nil {
+		return nil, err
+	} else if id != TokenOpen {
+		return nil, &NotAContainerError{d.Offset(), id}
+	}
+	return &Decoder{s: d.s, minDepth: d.Depth()}, nil
 }
 
 func (d *Decoder) Peek() *Peeker {
