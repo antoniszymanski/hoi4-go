@@ -6,42 +6,34 @@ package hoi4date
 
 import "github.com/antoniszymanski/checked-go"
 
-func FromString(x string) (Date, bool) {
-	i, x, ok := toInt64(x)
+func FromString(data string) (Date, bool) {
+	i, data, ok := toInt64(data)
 	if !ok {
 		return none()
 	}
-	if x == "" {
-		year, ok := checked.Cast[int32](i)
+	if data == "" {
+		binary, ok := checked.Cast[int32](i)
 		if !ok {
 			return none()
 		}
-		return FromBinary(year)
+		return FromBinary(binary)
 	}
 
 	year, ok := checked.Cast[int16](i)
-	if !ok {
-		return none()
-	}
-	if x == "" || x[0] != '.' {
+	if !ok || data[0] != '.' || len(data) <= 1 {
 		return none()
 	}
 
-	if len(x) <= 1 {
-		return none()
-	}
-	n := x[1]
-	var month1 uint8
+	n := data[1]
 	if !isAsciiDigit(n) {
 		return none()
-	} else {
-		month1 = n - '0'
 	}
-
-	if len(x) <= 2 {
+	month1 := n - '0'
+	if len(data) <= 2 {
 		return none()
 	}
-	n = x[2]
+
+	n = data[2]
 	month, offset := uint8(0), uint(0)
 	switch {
 	case n == '.':
@@ -51,76 +43,51 @@ func FromString(x string) (Date, bool) {
 	default:
 		return none()
 	}
-
-	if uint(len(x)) <= offset {
-		return none()
-	}
-	if x[offset] != '.' {
+	if uint(len(data)) <= offset || data[offset] != '.' || uint(len(data)) <= offset+1 {
 		return none()
 	}
 
-	if uint(len(x)) <= offset+1 {
-		return none()
-	}
-	n = x[offset+1]
-	var day1 uint8
+	n = data[offset+1]
 	if !isAsciiDigit(n) {
 		return none()
-	} else {
-		day1 = n - '0'
 	}
-
-	if uint(len(x)) <= offset+2 {
+	day1 := n - '0'
+	if uint(len(data)) <= offset+2 {
 		return some(year, month, day1, 0)
 	}
+
 	var day uint8
-	switch x[offset+2] {
+	switch data[offset+2] {
 	case '.':
 		day, offset = day1, offset+2
 	default:
-		n := x[offset+2]
-		if isAsciiDigit(n) {
-			result := day1*10 + (n - '0')
-			if uint(len(x)) != offset+3 {
-				day, offset = result, offset+3
-			} else {
-				return some(year, month, result, 0)
-			}
-		} else {
+		n := data[offset+2]
+		if !isAsciiDigit(n) {
 			return none()
 		}
+		day = day1*10 + (n - '0')
+		if uint(len(data)) == offset+3 {
+			return some(year, month, day, 0)
+		}
+		offset += 3
+	}
+	if uint(len(data)) <= offset || data[offset] != '.' || uint(len(data)) <= offset+1 {
+		return none()
 	}
 
-	if uint(len(x)) <= offset {
-		return none()
-	}
-	if x[offset] != '.' {
-		return none()
-	}
-
-	if uint(len(x)) <= offset+1 {
-		return none()
-	}
-	n = x[offset+1]
-	var hour1 uint8
+	n = data[offset+1]
 	if !isAsciiDigit(n) || n == '0' {
 		return none()
-	} else {
-		hour1 = n - '0'
 	}
-
-	if uint(len(x)) <= offset+2 {
+	hour1 := n - '0'
+	if uint(len(data)) <= offset+2 {
 		return some(year, month, day, hour1)
 	}
-	n = x[offset+2]
-	if isAsciiDigit(n) {
-		result := hour1*10 + (n - '0')
-		if uint(len(x)) != offset+3 {
-			return none()
-		} else {
-			return some(year, month, day, result)
-		}
-	} else {
+
+	n = data[offset+2]
+	if !isAsciiDigit(n) || uint(len(data)) != offset+3 {
 		return none()
 	}
+	hour := hour1*10 + (n - '0')
+	return some(year, month, day, hour)
 }
