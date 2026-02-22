@@ -160,7 +160,7 @@ func (d *Decoder) SkipAll() error {
 	return nil
 }
 
-func (d *Decoder) Container() (*Decoder, error) {
+func (d *Decoder) EnterContainer() (*Decoder, error) {
 	id, err := d.SkipToken()
 	if err != nil {
 		return nil, err
