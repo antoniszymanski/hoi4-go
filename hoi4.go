@@ -121,8 +121,7 @@ func unmarshalBool(dec *hoi4text.Decoder, out reflect.Value) error {
 	t, err := dec.ReadToken()
 	if err != nil {
 		return &ReadTokenError{dec.Offset(), err}
-	}
-	if t.ID() != hoi4text.TokenBool {
+	} else if t.ID() != hoi4text.TokenBool {
 		return &InvalidTokenError{t, out.Type()}
 	}
 	out.SetBool(t.Bool())

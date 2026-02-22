@@ -164,8 +164,7 @@ func (d *Decoder) EnterContainer() (*Decoder, error) {
 	id, err := d.SkipToken()
 	if err != nil {
 		return nil, err
-	}
-	if id != TokenOpen {
+	} else if id != TokenOpen {
 		return nil, &NotAContainerError{d.Offset(), id}
 	}
 	return &Decoder{s: d.s, minDepth: d.Depth()}, nil
