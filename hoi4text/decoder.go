@@ -189,23 +189,19 @@ func (d *Decoder) PeekKind() (Kind, error) {
 	p := d.Peek()
 	defer p.Close()
 
-	t, err := p.ReadToken()
-	if err != nil {
-		return 0, err
-	}
-	if t.ID() != TokenOpen {
+	if id, err := p.SkipToken(); err != nil {
+		return KindInvalid, err
+	} else if id != TokenOpen {
 		return KindScalar, nil
 	}
 
 	if _, err := p.SkipToken(); err != nil {
-		return 0, err
+		return KindInvalid, err
 	}
 
-	t, err = p.ReadToken()
-	if err != nil {
-		return 0, err
-	}
-	if t.ID() != TokenEqual {
+	if id, err := p.SkipToken(); err != nil {
+		return KindInvalid, err
+	} else if id != TokenEqual {
 		return KindArray, nil
 	} else {
 		return KindObject, nil
@@ -215,7 +211,8 @@ func (d *Decoder) PeekKind() (Kind, error) {
 type Kind uint8
 
 const (
-	KindScalar Kind = iota + 1
+	KindInvalid Kind = iota
+	KindScalar
 	KindArray
 	KindObject
 )
