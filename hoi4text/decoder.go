@@ -178,15 +178,7 @@ func (d *Decoder) SkipValue() error {
 		return nil
 	}
 	d = &Decoder{s: d.s, minDepth: d.Depth()}
-	for {
-		if _, err = d.SkipToken(); err != nil {
-			break
-		}
-	}
-	if err != ErrEndOfObject && err != io.EOF {
-		return err
-	}
-	return nil
+	return d.SkipAll()
 }
 
 func (d *Decoder) Peek() *Peeker {
