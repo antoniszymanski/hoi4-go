@@ -50,3 +50,15 @@ func (d Date) AppendFormat(b []byte, format DateFormat) []byte {
 		return fmt.Appendf(b, "%04d-%02d-%02dT%02d", d.Year, d.Month, d.Day, d.Hour-1)
 	}
 }
+
+func some(year int16, month, day, hour uint8) (Date, bool) {
+	d := Date{year, month, day, hour}
+	if !d.IsValid() {
+		return none()
+	}
+	return d, true
+}
+
+func none() (Date, bool) {
+	return Date{}, false
+}
