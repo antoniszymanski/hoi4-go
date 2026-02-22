@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2025 Antoni Szymański
+// SPDX-FileCopyrightText: Nick Babcock
 // SPDX-License-Identifier: MPL-2.0
 
 //nolint:gosec // G115
