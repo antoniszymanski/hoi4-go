@@ -7,8 +7,8 @@ package hoi4date
 import "github.com/antoniszymanski/checked-go"
 
 func FromString(x string) (Date, bool) {
-	i, x, err := to_i64_t(x)
-	if err != nil {
+	i, x, ok := toInt64(x)
+	if !ok {
 		return none()
 	}
 	if x == "" {
@@ -32,7 +32,7 @@ func FromString(x string) (Date, bool) {
 	}
 	n := x[1]
 	var month1 uint8
-	if !is_ascii_digit(n) {
+	if !isAsciiDigit(n) {
 		return none()
 	} else {
 		month1 = n - '0'
@@ -46,7 +46,7 @@ func FromString(x string) (Date, bool) {
 	switch {
 	case n == '.':
 		month, offset = month1, 2
-	case is_ascii_digit(n):
+	case isAsciiDigit(n):
 		month, offset = month1*10+(n-'0'), 3
 	default:
 		return none()
@@ -64,7 +64,7 @@ func FromString(x string) (Date, bool) {
 	}
 	n = x[offset+1]
 	var day1 uint8
-	if !is_ascii_digit(n) {
+	if !isAsciiDigit(n) {
 		return none()
 	} else {
 		day1 = n - '0'
@@ -79,7 +79,7 @@ func FromString(x string) (Date, bool) {
 		day, offset = day1, offset+2
 	default:
 		n := x[offset+2]
-		if is_ascii_digit(n) {
+		if isAsciiDigit(n) {
 			result := day1*10 + (n - '0')
 			if uint(len(x)) != offset+3 {
 				day, offset = result, offset+3
@@ -103,7 +103,7 @@ func FromString(x string) (Date, bool) {
 	}
 	n = x[offset+1]
 	var hour1 uint8
-	if !is_ascii_digit(n) || n == '0' {
+	if !isAsciiDigit(n) || n == '0' {
 		return none()
 	} else {
 		hour1 = n - '0'
@@ -113,7 +113,7 @@ func FromString(x string) (Date, bool) {
 		return some(year, month, day, hour1)
 	}
 	n = x[offset+2]
-	if is_ascii_digit(n) {
+	if isAsciiDigit(n) {
 		result := hour1*10 + (n - '0')
 		if uint(len(x)) != offset+3 {
 			return none()
