@@ -1,6 +1,6 @@
 module github.com/antoniszymanski/hoi4-go
 
-go 1.24.6
+go 1.26
 
 require (
 	github.com/antoniszymanski/checked-go v0.1.0

@@ -12,21 +12,20 @@ import (
 	"testing"
 
 	"github.com/antoniszymanski/hoi4-go"
+	"github.com/antoniszymanski/hoi4-go/hoi4date"
 	"github.com/k0kubun/pp/v3"
 )
 
 type Save struct {
-	hoi4.InlineStruct[Save]
-	Player          hoi4.String                     `hoi4:"player"`
-	Date            hoi4.Date                       `hoi4:"date"`
-	PlayerCountries hoi4.Map[string, PlayerCountry] `hoi4:"player_countries"`
+	Player          string                   `hoi4:"player"`
+	Date            hoi4date.Date            `hoi4:"date"`
+	PlayerCountries map[string]PlayerCountry `hoi4:"player_countries"`
 }
 
 type PlayerCountry struct {
-	hoi4.InlineStruct[PlayerCountry]
-	User          hoi4.String `hoi4:"user"`
-	CountryLeader hoi4.Bool   `hoi4:"country_leader"`
-	ID            hoi4.Int64  `hoi4:"id"`
+	User          string `hoi4:"user"`
+	CountryLeader bool   `hoi4:"country_leader"`
+	ID            int64  `hoi4:"id"`
 }
 
 func Benchmark(b *testing.B) {
@@ -73,17 +72,15 @@ func Benchmark(b *testing.B) {
 		b.Fatal(err)
 	}
 	expected := Save{
-		InlineStruct: hoi4.InlineStruct[Save]{},
-		Player:       "FRA",
-		Date: hoi4.Date{
+		Player: "FRA",
+		Date: hoi4date.Date{
 			Year:  1936,
 			Month: 1,
 			Day:   1,
 			Hour:  12,
 		},
-		PlayerCountries: hoi4.Map[string, PlayerCountry]{
-			"FRA": PlayerCountry{
-				InlineStruct:  hoi4.InlineStruct[PlayerCountry]{},
+		PlayerCountries: map[string]PlayerCountry{
+			"FRA": {
 				User:          "comagoosie",
 				CountryLeader: true,
 				ID:            1,

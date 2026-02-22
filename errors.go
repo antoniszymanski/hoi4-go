@@ -1,64 +1,89 @@
-// SPDX-FileCopyrightText: 2025 Antoni Szymański
+// SPDX-FileCopyrightText: 2026 Antoni Szymański
 // SPDX-License-Identifier: MPL-2.0
 
 package hoi4
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
-	"strconv"
-	"strings"
 
-	"github.com/antoniszymanski/checked-go"
-	"github.com/antoniszymanski/hoi4-go/hoi4date"
 	"github.com/antoniszymanski/hoi4-go/hoi4text"
 )
 
-const ErrorPrefix = "hoi4: "
+var (
+	ErrNotANonNilPointer = errors.New("passed value is not a non-nil pointer")
+	ErrNilInterface      = errors.New("cannot unmarshal into nil interface")
+	ErrEmbeddedInterface = errors.New("cannot unmarshal into embedded interface")
+)
 
-type SemanticError struct {
-	Offset uint64
-	GoType reflect.Type
-	Err    error
+type CreateDecoderError struct {
+	Err error
 }
 
-func (e SemanticError) Error() string {
-	var b []byte
-	b = append(b, ErrorPrefix+"unable to unmarshal into Go "...)
-	b = append(b, e.GoType.String()...)
-	b = append(b, ": "...)
-	err := e.Err.Error()
-	switch reflect.TypeOf(e.Err).PkgPath() {
-	case "github.com/antoniszymanski/hoi4-go":
-		err = strings.TrimPrefix(err, ErrorPrefix)
-	case "github.com/antoniszymanski/hoi4-go/hoi4text":
-		err = strings.TrimPrefix(err, hoi4text.ErrorPrefix)
-	case "github.com/antoniszymanski/hoi4-go/hoi4date":
-		err = strings.TrimPrefix(err, hoi4date.ErrorPrefix)
-	}
-	b = append(b, err...)
-	b = strconv.AppendUint(append(b, " at offset "...), e.Offset, 10)
-	return string(b)
+func (e *CreateDecoderError) Error() string {
+	return fmt.Sprintf("failed to create a new decoder: %v", e.Err)
 }
 
-func (e SemanticError) Unwrap() error {
+func (e *CreateDecoderError) Unwrap() error {
 	return e.Err
 }
 
-type ErrUnexpectedToken struct {
+type InvalidTypeError struct {
+	Type reflect.Type
+}
+
+func (e *InvalidTypeError) Error() string {
+	return fmt.Sprintf("cannot unmarshal into Go value of type %v", e.Type)
+}
+
+type ReadTokenError struct {
+	Offset uint64
+	Err    error
+}
+
+func (e *ReadTokenError) Error() string {
+	return fmt.Sprintf("failed to read token at offset %d: %v", e.Offset, e.Err)
+}
+
+func (e *ReadTokenError) Unwrap() error {
+	return e.Err
+}
+
+type UnmarshalDateError[T int32 | string] struct {
+	Input T
+}
+
+func (e *UnmarshalDateError[T]) Error() string {
+	return fmt.Sprintf("failed to unmarshal date: %q is not valid", e.Input)
+}
+
+type InvalidTokenError struct {
 	Token hoi4text.Token
+	Type  reflect.Type
 }
 
-func (e ErrUnexpectedToken) Error() string {
-	return ErrorPrefix + `unexpected token "` + e.Token.ID().String() + `"`
+func (e *InvalidTokenError) Error() string {
+	return fmt.Sprintf("cannot unmarshal %v token into Go value of type %v", e.Token.ID(), e.Type)
 }
 
-var ErrOutOfRange = errors.New(ErrorPrefix + "out of range")
+type OverflowError[T int64 | uint64 | float64 | int32] struct {
+	Value T
+	Type  reflect.Type
+}
 
-func cast[U, T checked.Integer](a T) (U, error) {
-	b, ok := checked.Cast[U](a)
-	if !ok {
-		return 0, ErrOutOfRange
-	}
-	return b, nil
+func (e *OverflowError[T]) Error() string {
+	return fmt.Sprintf("%v(%v) cannot be represented by Go value of type %v", reflect.TypeFor[T](), e.Value, e.Type)
+}
+
+type EnterContainerError struct {
+	Err error
+}
+
+func (e *EnterContainerError) Error() string {
+	return fmt.Sprintf("failed to enter the container: %v", e.Err)
+}
+
+func (e *EnterContainerError) Unwrap() error {
+	return e.Err
 }
