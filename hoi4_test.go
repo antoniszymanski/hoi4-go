@@ -6,70 +6,28 @@ package hoi4_test
 import (
 	"archive/zip"
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"reflect"
+	"strings"
+	"sync"
 	"testing"
 
+	"github.com/alecthomas/repr"
 	"github.com/antoniszymanski/hoi4-go"
 	"github.com/antoniszymanski/hoi4-go/hoi4date"
-	"github.com/k0kubun/pp/v3"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
-type Save struct {
-	Player          string                   `hoi4:"player"`
-	Date            hoi4date.Date            `hoi4:"date"`
-	PlayerCountries map[string]PlayerCountry `hoi4:"player_countries"`
-}
-
-type PlayerCountry struct {
-	User          string `hoi4:"user"`
-	CountryLeader bool   `hoi4:"country_leader"`
-	ID            int64  `hoi4:"id"`
-}
-
-func Benchmark(b *testing.B) {
-	resp, err := http.Get("https://hoi4saves-test-cases.s3.us-west-002.backblazeb2.com/1.10-ironman.zip")
+func Test(t *testing.T) {
+	in, err := savefile()
 	if err != nil {
-		b.Fatal(err)
+		t.Fatal(err)
 	}
-	defer resp.Body.Close() //nolint:errcheck
-
-	in, err := io.ReadAll(resp.Body)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	r := bytes.NewReader(in)
-	zr, err := zip.NewReader(r, r.Size())
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	f, err := zr.Open("1.10-ironman.hoi4")
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer f.Close() //nolint:errcheck
-
-	in, err = io.ReadAll(f)
-	if err != nil {
-		b.Fatal(err)
-	}
-
-	b.ReportAllocs()
-	b.ResetTimer()
-	for b.Loop() {
-		var out Save
-		if err := hoi4.Unmarshal(in, &out); err != nil {
-			b.Fatal(err)
-		}
-	}
-	b.StopTimer()
-
 	var actual Save
 	if err := hoi4.Unmarshal(in, &actual); err != nil {
-		b.Fatal(err)
+		t.Fatal(err)
 	}
 	expected := Save{
 		Player: "FRA",
@@ -87,7 +45,69 @@ func Benchmark(b *testing.B) {
 			},
 		},
 	}
-	if !reflect.DeepEqual(&actual, &expected) {
-		b.Fatal(pp.Sprintf("Not equal:\nactual: %v\nexpected: %v", &actual, &expected))
+	if !reflect.DeepEqual(expected, actual) {
+		dmp := diffmatchpatch.New()
+		repr := func(v any) string {
+			var sb strings.Builder
+			repr.New(&sb).Print(v)
+			return sb.String()
+		}
+		diffs := dmp.DiffMain(repr(expected), repr(actual), false)
+		fmt.Fprint(t.Output(), dmp.DiffPrettyText(diffs)) //nolint:errcheck
+		t.Fail()
 	}
 }
+
+func Benchmark(b *testing.B) {
+	in, err := savefile()
+	if err != nil {
+		b.Fatal(err)
+	}
+	b.ReportAllocs()
+	b.ResetTimer()
+	for b.Loop() {
+		var out Save
+		if err := hoi4.Unmarshal(in, &out); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+type Save struct {
+	Player          string                   `hoi4:"player"`
+	Date            hoi4date.Date            `hoi4:"date"`
+	PlayerCountries map[string]PlayerCountry `hoi4:"player_countries"`
+}
+
+type PlayerCountry struct {
+	User          string `hoi4:"user"`
+	CountryLeader bool   `hoi4:"country_leader"`
+	ID            int64  `hoi4:"id"`
+}
+
+var savefile = sync.OnceValues(func() ([]byte, error) {
+	resp, err := http.Get("https://hoi4saves-test-cases.s3.us-west-002.backblazeb2.com/1.10-ironman.zip")
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close() //nolint:errcheck
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	r := bytes.NewReader(data)
+	zr, err := zip.NewReader(r, r.Size())
+	if err != nil {
+		return nil, err
+	}
+
+	f, err := zr.Open("1.10-ironman.hoi4")
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close() //nolint:errcheck
+
+	return io.ReadAll(f)
+})
