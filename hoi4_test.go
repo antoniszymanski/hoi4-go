@@ -4,8 +4,6 @@
 package hoi4_test
 
 import (
-	"archive/zip"
-	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -86,28 +84,10 @@ type PlayerCountry struct {
 }
 
 var savefile = sync.OnceValues(func() ([]byte, error) {
-	resp, err := http.Get("https://hoi4saves-test-cases.s3.us-west-002.backblazeb2.com/1.10-ironman.zip")
+	resp, err := http.Get("https://cdn-dev.pdx.tools/hoi4-saves/1.10-ironman.hoi4")
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close() //nolint:errcheck
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	r := bytes.NewReader(data)
-	zr, err := zip.NewReader(r, r.Size())
-	if err != nil {
-		return nil, err
-	}
-
-	f, err := zr.Open("1.10-ironman.hoi4")
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close() //nolint:errcheck
-
-	return io.ReadAll(f)
+	return io.ReadAll(resp.Body)
 })
