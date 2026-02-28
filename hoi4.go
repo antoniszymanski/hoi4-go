@@ -56,9 +56,10 @@ func unmarshal(dec *hoi4text.Decoder, out reflect.Value) error {
 	if u, ok := reflect.TypeAssert[Unmarshaler](out); ok {
 		return u.UnmarshalHOI4(dec)
 	}
-	typ := out.Type()
-	if typ == reflect.TypeFor[hoi4date.Date]() {
-		return unmarshalDate(dec, out)
+	if out.CanAddr() {
+		if out, ok := reflect.TypeAssert[*hoi4date.Date](out.Addr()); ok {
+			return unmarshalDate(dec, out)
+		}
 	}
 	switch out.Kind() {
 	case reflect.Bool:
@@ -78,7 +79,7 @@ func unmarshal(dec *hoi4text.Decoder, out reflect.Value) error {
 		return unmarshalMap(dec, out)
 	case reflect.Pointer:
 		if out.IsNil() {
-			out.Set(reflect.New(typ.Elem()))
+			out.Set(reflect.New(out.Type().Elem()))
 		}
 		return unmarshal(dec, out.Elem())
 	case reflect.Slice:
@@ -88,11 +89,11 @@ func unmarshal(dec *hoi4text.Decoder, out reflect.Value) error {
 	case reflect.Struct:
 		return unmarshalStruct(dec, out)
 	default:
-		return &InvalidTypeError{typ}
+		return &InvalidTypeError{out.Type()}
 	}
 }
 
-func unmarshalDate(dec *hoi4text.Decoder, out reflect.Value) error {
+func unmarshalDate(dec *hoi4text.Decoder, out *hoi4date.Date) error {
 	t, err := dec.ReadToken()
 	if err != nil {
 		return &ReadTokenError{dec.Offset(), err}
@@ -113,7 +114,7 @@ func unmarshalDate(dec *hoi4text.Decoder, out reflect.Value) error {
 	default:
 		return &InvalidTokenError{t, reflect.TypeFor[hoi4date.Date]()}
 	}
-	out.Set(reflect.ValueOf(x))
+	*out = x
 	return nil
 }
 
