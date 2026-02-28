@@ -64,7 +64,7 @@ type InvalidTokenError struct {
 }
 
 func (e *InvalidTokenError) Error() string {
-	return fmt.Sprintf("cannot unmarshal %v token into Go value of type %v", e.Token.ID(), e.Type)
+	return fmt.Sprintf("cannot unmarshal token %v into Go value of type %v", e.Token.ID(), e.Type)
 }
 
 type OverflowError[T int64 | uint64 | float64 | int32] struct {
@@ -86,4 +86,12 @@ func (e *EnterContainerError) Error() string {
 
 func (e *EnterContainerError) Unwrap() error {
 	return e.Err
+}
+
+type InvalidKeyValueSeparatorError struct {
+	TokenID hoi4text.TokenID
+}
+
+func (e *InvalidKeyValueSeparatorError) Error() string {
+	return fmt.Sprintf("token %v is not a valid key-value separator", e.TokenID)
 }

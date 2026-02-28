@@ -239,8 +239,10 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 		if err = unmarshal(dec, key); err != nil {
 			break
 		}
-		if _, err := dec.SkipToken(); err != nil {
+		if id, err := dec.SkipToken(); err != nil {
 			return err
+		} else if id != hoi4text.TokenEqual {
+			return &InvalidKeyValueSeparatorError{id}
 		}
 		elem := zero(typ.Elem())
 		if err := unmarshal(dec, elem); err != nil {
@@ -316,8 +318,10 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 		if err = unmarshalString(dec, reflect.ValueOf(&key).Elem()); err != nil {
 			break
 		}
-		if _, err := dec.SkipToken(); err != nil {
+		if id, err := dec.SkipToken(); err != nil {
 			return err
+		} else if id != hoi4text.TokenEqual {
+			return &InvalidKeyValueSeparatorError{id}
 		}
 		if index := fieldIndices[key]; len(index) > 0 {
 			field := fieldByIndex(out, index)
