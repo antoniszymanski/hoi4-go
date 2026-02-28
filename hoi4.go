@@ -104,12 +104,12 @@ func unmarshalDate(dec *hoi4text.Decoder, out *hoi4date.Date) error {
 	case hoi4text.TokenI32:
 		x, ok = hoi4date.ParseBinary(t.I32())
 		if !ok {
-			return &UnmarshalDateError[int32]{t.I32()}
+			return &ParseDateError[int32]{t.I32()}
 		}
 	case hoi4text.TokenQuoted:
 		x, ok = hoi4date.Parse(t.Quoted())
 		if !ok {
-			return &UnmarshalDateError[string]{t.Quoted()}
+			return &ParseDateError[string]{t.Quoted()}
 		}
 	default:
 		return &InvalidTokenError{t, reflect.TypeFor[hoi4date.Date]()}

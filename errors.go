@@ -7,6 +7,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"strconv"
+	"unsafe"
 
 	"github.com/antoniszymanski/hoi4-go/hoi4text"
 )
@@ -50,12 +52,32 @@ func (e *ReadTokenError) Unwrap() error {
 	return e.Err
 }
 
-type UnmarshalDateError[T int32 | string] struct {
+type ParseDateError[T int32 | string] struct {
 	Input T
 }
 
-func (e *UnmarshalDateError[T]) Error() string {
-	return fmt.Sprintf("failed to unmarshal date: %q is not valid", e.Input)
+func (e *ParseDateError[T]) Error() string {
+	var dst []byte
+	dst = append(dst, "failed to parse "...)
+	switch unsafe.Sizeof(e.Input) {
+	case unsafe.Sizeof(int32(0)):
+		dst = strconv.AppendInt(dst, int64(*(*int32)(unsafe.Pointer(&e.Input))), 10)
+	case unsafe.Sizeof(""):
+		dst = appendQuote(dst, *(*string)(unsafe.Pointer(&e.Input)))
+	}
+	dst = append(dst, " as a date"...)
+	return string(dst)
+}
+
+func appendQuote(dst []byte, s string) []byte {
+	if strconv.CanBackquote(s) {
+		dst = append(dst, '`')
+		dst = append(dst, s...)
+		dst = append(dst, '`')
+		return dst
+	} else {
+		return strconv.AppendQuoteToGraphic(dst, s)
+	}
 }
 
 type InvalidTokenError struct {
