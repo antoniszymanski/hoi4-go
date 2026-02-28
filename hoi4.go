@@ -236,11 +236,8 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 	out.Set(reflect.MakeMap(typ))
 	for {
 		key := zero(typ.Key())
-		if err := unmarshal(dec, key); err != nil {
-			if !errors.Is(err, hoi4text.ErrEndOfObject) {
-				return err
-			}
-			return nil
+		if err = unmarshal(dec, key); err != nil {
+			break
 		}
 		if _, err := dec.SkipToken(); err != nil {
 			return err
@@ -251,6 +248,10 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 		}
 		out.SetMapIndex(key, elem)
 	}
+	if !errors.Is(err, hoi4text.ErrEndOfObject) {
+		return err
+	}
+	return nil
 }
 
 func unmarshalSlice(dec *hoi4text.Decoder, out reflect.Value) error {
@@ -312,11 +313,8 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 	}
 	for {
 		var key string
-		if err := unmarshalString(dec, reflect.ValueOf(&key).Elem()); err != nil {
-			if !errors.Is(err, hoi4text.ErrEndOfObject) {
-				return err
-			}
-			return nil
+		if err = unmarshalString(dec, reflect.ValueOf(&key).Elem()); err != nil {
+			break
 		}
 		if _, err := dec.SkipToken(); err != nil {
 			return err
@@ -332,6 +330,10 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 			}
 		}
 	}
+	if !errors.Is(err, hoi4text.ErrEndOfObject) {
+		return err
+	}
+	return nil
 }
 
 func fieldIndices(typ reflect.Type) (m map[string][]int, err error) {
