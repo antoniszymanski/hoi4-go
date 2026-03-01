@@ -158,6 +158,19 @@ func (d *Decoder) SkipAll() error {
 	return nil
 }
 
+func (d *Decoder) ReadValue(buf []Token) ([]Token, error) {
+	t, err := d.ReadToken()
+	if err != nil {
+		return nil, err
+	}
+	buf = append(buf, t)
+	if t.ID() != TokenOpen {
+		return buf, nil
+	}
+	d = &Decoder{s: d.s, minDepth: d.Depth()}
+	return d.ReadAll(buf)
+}
+
 func (d *Decoder) SkipValue() error {
 	id, err := d.SkipToken()
 	if err != nil {
