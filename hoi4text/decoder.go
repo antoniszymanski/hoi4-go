@@ -80,9 +80,9 @@ func (d *decoderState) SkipToken() (TokenID, error) {
 }
 
 type Decoder struct {
-	s           *decoderState
-	minDepth    uint
-	endOfObject bool
+	s              *decoderState
+	minDepth       uint
+	endOfContainer bool
 }
 
 func NewDecoder(r io.Reader) (*Decoder, error) {
@@ -104,13 +104,13 @@ func (d *Decoder) Depth() uint {
 func (d *Decoder) ReadToken() (Token, error) {
 	if d.minDepth == 0 {
 		return d.s.ReadToken()
-	} else if d.endOfObject {
-		return Token{}, ErrEndOfObject
+	} else if d.endOfContainer {
+		return Token{}, ErrEndOfContainer
 	}
 	t, err := d.s.ReadToken()
 	if d.Depth() < d.minDepth {
-		d.endOfObject = true
-		return Token{}, ErrEndOfObject
+		d.endOfContainer = true
+		return Token{}, ErrEndOfContainer
 	}
 	return t, err
 }
@@ -118,13 +118,13 @@ func (d *Decoder) ReadToken() (Token, error) {
 func (d *Decoder) SkipToken() (TokenID, error) {
 	if d.minDepth == 0 {
 		return d.s.SkipToken()
-	} else if d.endOfObject {
-		return TokenInvalid, ErrEndOfObject
+	} else if d.endOfContainer {
+		return TokenInvalid, ErrEndOfContainer
 	}
 	id, err := d.s.SkipToken()
 	if d.Depth() < d.minDepth {
-		d.endOfObject = true
-		return TokenInvalid, ErrEndOfObject
+		d.endOfContainer = true
+		return TokenInvalid, ErrEndOfContainer
 	}
 	return id, err
 }
@@ -139,7 +139,7 @@ func (d *Decoder) ReadAll(buf []Token) ([]Token, error) {
 		}
 		buf = append(buf, t)
 	}
-	if err != ErrEndOfObject && err != io.EOF {
+	if err != ErrEndOfContainer && err != io.EOF {
 		return nil, err
 	}
 	return buf, nil
@@ -152,7 +152,7 @@ func (d *Decoder) SkipAll() error {
 			break
 		}
 	}
-	if err != ErrEndOfObject && err != io.EOF {
+	if err != ErrEndOfContainer && err != io.EOF {
 		return err
 	}
 	return nil

@@ -250,7 +250,7 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 		}
 		out.SetMapIndex(key, elem)
 	}
-	if !errors.Is(err, hoi4text.ErrEndOfObject) {
+	if !errors.Is(err, hoi4text.ErrEndOfContainer) {
 		return err
 	}
 	return nil
@@ -269,7 +269,7 @@ func unmarshalSlice(dec *hoi4text.Decoder, out reflect.Value) error {
 		}
 		out.Set(reflect.Append(out, elem))
 	}
-	if !errors.Is(err, hoi4text.ErrEndOfObject) {
+	if !errors.Is(err, hoi4text.ErrEndOfContainer) {
 		return err
 	}
 	return nil
@@ -334,7 +334,7 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 			}
 		}
 	}
-	if !errors.Is(err, hoi4text.ErrEndOfObject) {
+	if !errors.Is(err, hoi4text.ErrEndOfContainer) {
 		return err
 	}
 	return nil

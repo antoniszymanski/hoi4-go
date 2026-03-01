@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	ErrUnknownHeader = errors.New("unknown header")
-	ErrUnimplemented = errors.New("unimplemented")
-	ErrInvalidToken  = errors.New("invalid token")
-	ErrEndOfObject   = errors.New("end of object")
+	ErrUnknownHeader  = errors.New("unknown header")
+	ErrUnimplemented  = errors.New("unimplemented")
+	ErrInvalidToken   = errors.New("invalid token")
+	ErrEndOfContainer = errors.New("end of container")
 )
 
 type NotAContainerError struct {
