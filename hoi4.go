@@ -316,7 +316,7 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 	}
 	for {
 		var key string
-		if err = unmarshalKey(dec, &key); err != nil {
+		if err = unmarshalObjectKey(dec, &key); err != nil {
 			break
 		}
 		if id, err := dec.SkipToken(); err != nil {
@@ -389,7 +389,7 @@ func fieldIndices(typ reflect.Type) (m map[string][]int, err error) {
 
 var cache sync.Map // map[reflect.Type](map[string][]int | error)
 
-func unmarshalKey(dec *hoi4text.Decoder, out *string) error {
+func unmarshalObjectKey(dec *hoi4text.Decoder, out *string) error {
 	t, err := dec.ReadToken()
 	if err != nil {
 		return &ReadTokenError{dec.Offset(), err}
