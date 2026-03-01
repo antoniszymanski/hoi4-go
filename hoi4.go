@@ -57,10 +57,8 @@ func unmarshal(dec *hoi4text.Decoder, out reflect.Value) error {
 	if u, ok := reflect.TypeAssert[Unmarshaler](out); ok {
 		return u.UnmarshalHOI4(dec)
 	}
-	if out.CanAddr() {
-		if out, ok := reflect.TypeAssert[*hoi4date.Date](out.Addr()); ok {
-			return unmarshalDate(dec, out)
-		}
+	if out, ok := reflect.TypeAssert[*hoi4date.Date](out); ok {
+		return unmarshalDate(dec, out)
 	}
 	switch out.Kind() {
 	case reflect.Bool:
@@ -236,8 +234,8 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 	typ := out.Type()
 	out.Set(reflect.MakeMap(typ))
 	for {
-		key := zero(typ.Key())
-		if err = unmarshal(dec, key); err != nil {
+		keyPtr := reflect.New(typ.Key())
+		if err = unmarshal(dec, keyPtr); err != nil {
 			break
 		}
 		if id, err := dec.SkipToken(); err != nil {
@@ -245,11 +243,11 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 		} else if id != hoi4text.TokenEqual {
 			return &InvalidKeyValueSeparatorError{id}
 		}
-		elem := zero(typ.Elem())
-		if err := unmarshal(dec, elem); err != nil {
+		elemPtr := reflect.New(typ.Elem())
+		if err := unmarshal(dec, elemPtr); err != nil {
 			return err
 		}
-		out.SetMapIndex(key, elem)
+		out.SetMapIndex(keyPtr.Elem(), elemPtr.Elem())
 	}
 	if !errors.Is(err, hoi4text.ErrEndOfContainer) {
 		return err
@@ -264,20 +262,16 @@ func unmarshalSlice(dec *hoi4text.Decoder, out reflect.Value) error {
 	}
 	elemType := out.Type().Elem()
 	for {
-		elem := zero(elemType)
-		if err = unmarshal(dec, elem); err != nil {
+		elemPtr := reflect.New(elemType)
+		if err = unmarshal(dec, elemPtr); err != nil {
 			break
 		}
-		out.Set(reflect.Append(out, elem))
+		out.Set(reflect.Append(out, elemPtr.Elem()))
 	}
 	if !errors.Is(err, hoi4text.ErrEndOfContainer) {
 		return err
 	}
 	return nil
-}
-
-func zero(typ reflect.Type) reflect.Value {
-	return reflect.New(typ).Elem()
 }
 
 func unmarshalString(dec *hoi4text.Decoder, out reflect.Value) error {
@@ -326,7 +320,7 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 		}
 		if index := fieldIndices[key]; len(index) > 0 {
 			field := fieldByIndex(out, index)
-			if err := unmarshal(dec, field); err != nil {
+			if err := unmarshal(dec, field.Addr()); err != nil {
 				return err
 			}
 		} else {
