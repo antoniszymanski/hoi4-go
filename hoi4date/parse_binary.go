@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: Nick Babcock
 // SPDX-License-Identifier: MPL-2.0
 
-//nolint:gosec // G115
 package hoi4date
 
 import "github.com/antoniszymanski/checked-go"
@@ -30,6 +29,7 @@ func ParseBinary(data int32) (Date, bool) {
 }
 
 func monthDayFromJulian(daysSinceJan1 int32) (month, day uint8) {
+	//#nosec G115
 	switch {
 	case daysSinceJan1 >= 0 && daysSinceJan1 <= 30:
 		return 1, uint8(daysSinceJan1 + 1)
