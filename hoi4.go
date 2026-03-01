@@ -267,7 +267,7 @@ func unmarshalSlice(dec *hoi4text.Decoder, out reflect.Value) error {
 		if err = unmarshal(dec, elem); err != nil {
 			break
 		}
-		out = reflect.Append(out, elem)
+		out.Set(reflect.Append(out, elem))
 	}
 	if !errors.Is(err, hoi4text.ErrEndOfObject) {
 		return err

@@ -42,6 +42,9 @@ func Test(t *testing.T) {
 				ID:            1,
 			},
 		},
+		Achievement: []int32{
+			3, 6, 19, 2, 8, 13, 21, 7, 4, 9, 25, 30, 43, 44, 54, 90, 92, 93, 96, 99, 100, 101, 102, 108, 109, 111, 113, 120, 122,
+		},
 	}
 	if !reflect.DeepEqual(expected, actual) {
 		dmp := diffmatchpatch.New()
@@ -75,6 +78,7 @@ type Save struct {
 	Player          string                   `hoi4:"player"`
 	Date            hoi4date.Date            `hoi4:"date"`
 	PlayerCountries map[string]PlayerCountry `hoi4:"player_countries"`
+	Achievement     []int32                  `hoi4:"achievement"`
 }
 
 type PlayerCountry struct {
