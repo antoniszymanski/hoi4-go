@@ -130,7 +130,6 @@ func (d *Decoder) SkipToken() (TokenID, error) {
 }
 
 func (d *Decoder) ReadAll(buf []Token) ([]Token, error) {
-	buf = buf[:0]
 	var t Token
 	var err error
 	for {
