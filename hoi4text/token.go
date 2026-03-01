@@ -5,7 +5,6 @@ package hoi4text
 
 import (
 	"cmp"
-	"encoding"
 	"encoding/binary"
 	"fmt"
 	"math"
@@ -251,60 +250,46 @@ func I64(i int64) Token {
 // #endregion
 
 var (
-	_ fmt.Stringer           = Token{}
-	_ encoding.TextMarshaler = Token{}
-	_ encoding.TextAppender  = Token{}
+	_ fmt.Stringer   = Token{}
+	_ fmt.GoStringer = Token{}
 )
 
 func (t Token) GoString() string {
-	return t.String()
+	return "hoi4text.Token(" + t.String() + ")"
 }
 
 func (t Token) String() string {
-	b, err := t.MarshalText()
-	if err != nil {
-		return "<invalid token>"
-	}
-	return string(b)
-}
-
-func (t Token) MarshalText() ([]byte, error) {
-	return t.AppendText(nil)
-}
-
-func (t Token) AppendText(b []byte) ([]byte, error) {
-	var err error
 	switch t.id {
 	case TokenInvalid:
-		err = ErrInvalidToken
+		return "invalid"
 	case TokenOpen:
-		b = append(b, '{')
+		return "{"
 	case TokenClose:
-		b = append(b, '}')
+		return "}"
 	case TokenEqual:
-		b = append(b, '=')
+		return "="
 	case TokenU32:
-		b = strconv.AppendUint(b, uint64(t.U32()), 10)
+		return strconv.FormatUint(uint64(t.U32()), 10)
 	case TokenU64:
-		b = strconv.AppendUint(b, t.U64(), 10)
+		return strconv.FormatUint(t.U64(), 10)
 	case TokenI32:
-		b = strconv.AppendInt(b, int64(t.I32()), 10)
+		return strconv.FormatInt(int64(t.I32()), 10)
 	case TokenBool:
-		b = strconv.AppendBool(b, t.Bool())
+		return strconv.FormatBool(t.Bool())
 	case TokenQuoted:
-		b = strconv.AppendQuote(b, t.Quoted())
+		return strconv.Quote(t.Quoted())
 	case TokenUnquoted:
-		b = append(b, t.Unquoted()...)
+		return t.Unquoted()
 	case TokenF32:
-		b = strconv.AppendFloat(b, float64(t.F32()), 'g', -1, 32)
+		return strconv.FormatFloat(float64(t.F32()), 'g', -1, 32)
 	case TokenF64:
-		b = strconv.AppendFloat(b, t.F64(), 'g', -1, 64)
+		return strconv.FormatFloat(t.F64(), 'g', -1, 64)
 	case TokenI64:
-		b = strconv.AppendInt(b, t.I64(), 10)
+		return strconv.FormatInt(t.I64(), 10)
 	default:
-		b = append(b, '<')
-		b = strconv.AppendUint(b, uint64(t.id), 10)
-		b = append(b, '>')
+		if text := Tokens.Get(t.id); text != "" {
+			return text
+		}
+		return "<unknown: " + strconv.FormatUint(uint64(t.id), 10) + ">"
 	}
-	return b, err
 }
