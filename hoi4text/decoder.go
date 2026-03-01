@@ -6,20 +6,12 @@ package hoi4text
 import "io"
 
 type decoderState struct {
-	r      Reader
-	buf    []bufferedToken
-	offset uint64
-	depth  uint
-	mode   uint8
+	r     *BufferedReader
+	depth uint
+	mode  uint8
 }
 
 func (d *decoderState) ReadToken() (Token, error) {
-	if len(d.buf) > 0 {
-		bt := d.buf[len(d.buf)-1]
-		d.buf = d.buf[:len(d.buf)-1]
-		d.offset = bt.offset
-		return bt.token, nil
-	}
 	var t Token
 	var err error
 	switch d.mode {
@@ -42,17 +34,10 @@ func (d *decoderState) ReadToken() (Token, error) {
 	case TokenClose:
 		d.depth--
 	}
-	d.offset = d.r.Offset()
 	return t, err
 }
 
 func (d *decoderState) SkipToken() (TokenID, error) {
-	if len(d.buf) > 0 {
-		bt := d.buf[len(d.buf)-1]
-		d.offset = bt.offset
-		d.buf = d.buf[:len(d.buf)-1]
-		return bt.token.ID(), nil
-	}
 	var id TokenID
 	var err error
 	switch d.mode {
@@ -60,7 +45,7 @@ func (d *decoderState) SkipToken() (TokenID, error) {
 		id = TokenOpen
 		d.mode = 1
 	case 1:
-		id, err = SkipToken(d.r)
+		id, err = d.r.SkipToken()
 		if err == io.EOF {
 			id = TokenClose
 			err = nil
@@ -75,7 +60,6 @@ func (d *decoderState) SkipToken() (TokenID, error) {
 	case TokenClose:
 		d.depth--
 	}
-	d.offset = d.r.Offset()
 	return id, err
 }
 
@@ -86,15 +70,15 @@ type Decoder struct {
 }
 
 func NewDecoder(r io.Reader) (*Decoder, error) {
-	tr, err := NewReader(r)
+	br, err := NewBufferedReader(r)
 	if err != nil {
 		return nil, err
 	}
-	return &Decoder{s: &decoderState{r: tr}}, nil
+	return &Decoder{s: &decoderState{r: br}}, nil
 }
 
 func (d *Decoder) Offset() uint64 {
-	return d.s.offset
+	return d.s.r.Offset()
 }
 
 func (d *Decoder) Depth() uint {
@@ -187,60 +171,15 @@ func (d *Decoder) EnterContainer() (*Decoder, error) {
 	if err != nil {
 		return nil, err
 	} else if id != TokenOpen {
-		return nil, &NotAContainerError{d.Offset(), id}
+		return nil, &UnexpectedTokenError{id, BeginningOfContainer, d.Offset()}
 	}
 	return &Decoder{s: d.s, minDepth: d.Depth()}, nil
 }
 
-func (d *Decoder) Peek() *Peeker {
-	return &Peeker{d: d.s}
+func (d *Decoder) Peek() *Peek {
+	return d.s.r.Peek()
 }
 
 func (d *Decoder) PeekKind() (Kind, error) {
-	p := d.Peek()
-	defer p.Close()
-
-	if id, err := p.SkipToken(); err != nil {
-		return KindInvalid, err
-	} else if id != TokenOpen {
-		return KindScalar, nil
-	}
-
-	if _, err := p.SkipToken(); err != nil {
-		return KindInvalid, err
-	}
-
-	if id, err := p.SkipToken(); err != nil {
-		return KindInvalid, err
-	} else if id != TokenEqual {
-		return KindArray, nil
-	} else {
-		return KindObject, nil
-	}
-}
-
-type Kind uint8
-
-const (
-	KindInvalid Kind = iota
-	KindScalar
-	KindArray
-	KindObject
-)
-
-func (k Kind) IsContainer() bool {
-	return k == KindArray || k == KindObject
-}
-
-func (k Kind) String() string {
-	switch k {
-	case KindScalar:
-		return "scalar"
-	case KindArray:
-		return "array"
-	case KindObject:
-		return "object"
-	default:
-		return "invalid"
-	}
+	return d.s.r.PeekKind()
 }
