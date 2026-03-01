@@ -9,6 +9,7 @@ import (
 	"io"
 	"reflect"
 	"slices"
+	"strconv"
 	"sync"
 
 	"github.com/antoniszymanski/checked-go"
@@ -315,7 +316,7 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 	}
 	for {
 		var key string
-		if err = unmarshalString(dec, reflect.ValueOf(&key).Elem()); err != nil {
+		if err = unmarshalKey(dec, &key); err != nil {
 			break
 		}
 		if id, err := dec.SkipToken(); err != nil {
@@ -387,6 +388,39 @@ func fieldIndices(typ reflect.Type) (m map[string][]int, err error) {
 }
 
 var cache sync.Map // map[reflect.Type](map[string][]int | error)
+
+func unmarshalKey(dec *hoi4text.Decoder, out *string) error {
+	t, err := dec.ReadToken()
+	if err != nil {
+		return &ReadTokenError{dec.Offset(), err}
+	}
+	var x string
+	switch t.ID() {
+	case hoi4text.TokenQuoted:
+		x = t.Quoted()
+	case hoi4text.TokenUnquoted:
+		x = t.Unquoted()
+	case hoi4text.TokenU32:
+		x = strconv.FormatUint(uint64(t.U32()), 10)
+	case hoi4text.TokenU64:
+		x = strconv.FormatUint(t.U64(), 10)
+	case hoi4text.TokenI32:
+		x = strconv.FormatInt(int64(t.I32()), 10)
+	case hoi4text.TokenI64:
+		x = strconv.FormatInt(t.I64(), 10)
+	default:
+		if !t.ID().IsID() {
+			return &InvalidObjectKey{t}
+		}
+		var ok bool
+		x, ok = hoi4text.Tokens.Lookup(t.ID())
+		if !ok {
+			return &InvalidObjectKey{t}
+		}
+	}
+	*out = x
+	return nil
+}
 
 func fieldByIndex(v reflect.Value, index []int) reflect.Value {
 	if len(index) == 1 {

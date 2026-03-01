@@ -117,3 +117,11 @@ type InvalidKeyValueSeparatorError struct {
 func (e *InvalidKeyValueSeparatorError) Error() string {
 	return fmt.Sprintf("token %v is not a valid key-value separator", e.TokenID)
 }
+
+type InvalidObjectKey struct {
+	Token hoi4text.Token
+}
+
+func (e *InvalidObjectKey) Error() string {
+	return fmt.Sprintf("token %v is not a object key", e.Token.ID())
+}
