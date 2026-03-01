@@ -289,9 +289,8 @@ func unmarshalString(dec *hoi4text.Decoder, out reflect.Value) error {
 		if !t.ID().IsID() {
 			return &InvalidTokenError{t, out.Type()}
 		}
-		var ok bool
-		x, ok = hoi4text.Tokens.Lookup(t.ID())
-		if !ok {
+		x = hoi4text.Tokens.Get(t.ID())
+		if x == "" {
 			return &InvalidTokenError{t, out.Type()}
 		}
 	}
@@ -406,9 +405,8 @@ func unmarshalObjectKey(dec *hoi4text.Decoder, out *string) error {
 		if !t.ID().IsID() {
 			return &InvalidObjectKeyError{t}
 		}
-		var ok bool
-		x, ok = hoi4text.Tokens.Lookup(t.ID())
-		if !ok {
+		x = hoi4text.Tokens.Get(t.ID())
+		if x == "" {
 			return &InvalidObjectKeyError{t}
 		}
 	}
