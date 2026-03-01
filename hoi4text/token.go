@@ -256,6 +256,10 @@ var (
 	_ encoding.TextAppender  = Token{}
 )
 
+func (t Token) GoString() string {
+	return t.String()
+}
+
 func (t Token) String() string {
 	b, err := t.MarshalText()
 	if err != nil {

@@ -404,12 +404,12 @@ func unmarshalObjectKey(dec *hoi4text.Decoder, out *string) error {
 		x = strconv.FormatInt(t.I64(), 10)
 	default:
 		if !t.ID().IsID() {
-			return &InvalidObjectKey{t}
+			return &InvalidObjectKeyError{t}
 		}
 		var ok bool
 		x, ok = hoi4text.Tokens.Lookup(t.ID())
 		if !ok {
-			return &InvalidObjectKey{t}
+			return &InvalidObjectKeyError{t}
 		}
 	}
 	*out = x
