@@ -46,6 +46,11 @@ func Test(t *testing.T) {
 			3, 6, 19, 2, 8, 13, 21, 7, 4, 9, 25, 30, 43, 44, 54, 90, 92, 93, 96, 99, 100, 101, 102, 108, 109, 111, 113, 120, 122,
 		},
 	}
+	test(t, expected, actual)
+}
+
+func test[T any](t *testing.T, expected, actual T) {
+	t.Helper()
 	if reflect.DeepEqual(expected, actual) {
 		return
 	}
