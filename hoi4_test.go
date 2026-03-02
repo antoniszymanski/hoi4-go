@@ -46,17 +46,21 @@ func Test(t *testing.T) {
 			3, 6, 19, 2, 8, 13, 21, 7, 4, 9, 25, 30, 43, 44, 54, 90, 92, 93, 96, 99, 100, 101, 102, 108, 109, 111, 113, 120, 122,
 		},
 	}
-	if !reflect.DeepEqual(expected, actual) {
-		dmp := diffmatchpatch.New()
-		repr := func(v any) string {
-			var sb strings.Builder
-			repr.New(&sb).Print(v)
-			return sb.String()
-		}
-		diffs := dmp.DiffMain(repr(expected), repr(actual), false)
-		fmt.Fprint(t.Output(), dmp.DiffPrettyText(diffs)) //nolint:errcheck
-		t.Fail()
+	if reflect.DeepEqual(expected, actual) {
+		return
 	}
+	repr := func(v any) string {
+		var sb strings.Builder
+		repr.New(&sb).Print(v)
+		return sb.String()
+	}
+	dmp := diffmatchpatch.New()
+	text1, text2, lineArray := dmp.DiffLinesToChars(repr(expected), repr(actual))
+	diffs := dmp.DiffMain(text1, text2, false)
+	diffs = dmp.DiffCharsToLines(diffs, lineArray)
+	diffs = dmp.DiffCleanupSemantic(diffs)
+	fmt.Fprint(t.Output(), dmp.DiffPrettyText(diffs)) //nolint:errcheck
+	t.Fail()
 }
 
 func Benchmark(b *testing.B) {
