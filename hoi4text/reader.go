@@ -46,10 +46,7 @@ func SkipToken(r Reader) (TokenID, error) {
 		return s.SkipToken()
 	}
 	t, err := r.ReadToken()
-	if err != nil {
-		return TokenInvalid, err
-	}
-	return t.ID(), nil
+	return t.ID(), err
 }
 
 func read(r io.Reader, length int, buf []byte) ([]byte, error) {
