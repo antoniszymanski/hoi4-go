@@ -9,9 +9,10 @@ import (
 )
 
 type BufferedReader struct {
-	r      Reader
-	offset uint64
-	buf    []bufferedToken
+	r       Reader
+	offset  uint64
+	buf     []bufferedToken
+	peekBuf []bufferedToken
 }
 
 type bufferedToken struct {
@@ -108,12 +109,11 @@ func (k Kind) String() string {
 }
 
 func (br *BufferedReader) Peek() *Peek {
-	return &Peek{br: br}
+	return &Peek{br}
 }
 
 type Peek struct {
-	br  *BufferedReader
-	buf []bufferedToken
+	br *BufferedReader
 }
 
 func (p *Peek) Offset() uint64 {
@@ -122,7 +122,7 @@ func (p *Peek) Offset() uint64 {
 
 func (p *Peek) ReadToken() (Token, error) {
 	t, err := p.br.ReadToken()
-	p.buf = append(p.buf, bufferedToken{
+	p.br.peekBuf = append(p.br.peekBuf, bufferedToken{
 		token:  t,
 		err:    err,
 		offset: p.br.Offset(),
@@ -136,6 +136,7 @@ func (p *Peek) SkipToken() (TokenID, error) {
 }
 
 func (p *Peek) Close() {
-	slices.Reverse(p.buf)
-	p.br.buf = append(p.br.buf, p.buf...)
+	slices.Reverse(p.br.peekBuf)
+	p.br.buf = append(p.br.buf, p.br.peekBuf...)
+	p.br.peekBuf = p.br.peekBuf[:0]
 }
