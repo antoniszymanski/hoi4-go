@@ -269,23 +269,23 @@ func (t Token) String() string {
 	case TokenEqual:
 		return "="
 	case TokenU32:
-		return strconv.FormatUint(uint64(t.U32()), 10)
+		return strconv.FormatUint(uint64(t.getU32()), 10)
 	case TokenU64:
-		return strconv.FormatUint(t.U64(), 10)
+		return strconv.FormatUint(t.getU64(), 10)
 	case TokenI32:
-		return strconv.FormatInt(int64(t.I32()), 10)
+		return strconv.FormatInt(int64(t.getI32()), 10)
 	case TokenBool:
-		return strconv.FormatBool(t.Bool())
+		return strconv.FormatBool(t.getBool())
 	case TokenQuoted:
-		return strconv.Quote(t.Quoted())
+		return strconv.Quote(t.getString())
 	case TokenUnquoted:
-		return t.Unquoted()
+		return t.getString()
 	case TokenF32:
-		return strconv.FormatFloat(float64(t.F32()), 'g', -1, 32)
+		return strconv.FormatFloat(float64(t.getF32()), 'g', -1, 32)
 	case TokenF64:
-		return strconv.FormatFloat(t.F64(), 'g', -1, 64)
+		return strconv.FormatFloat(t.getF64(), 'g', -1, 64)
 	case TokenI64:
-		return strconv.FormatInt(t.I64(), 10)
+		return strconv.FormatInt(t.getI64(), 10)
 	default:
 		if text := Tokens.Get(t.id); text != "" {
 			return text
