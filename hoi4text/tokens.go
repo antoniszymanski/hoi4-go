@@ -5,50 +5,24 @@ package hoi4text
 
 import (
 	_ "embed"
-	"encoding/binary"
+	"strings"
+
+	"github.com/antoniszymanski/hoi4-go/hoi4text/tokenmap"
 )
 
-type tokens struct {
-	m map[TokenID]string
+func GetToken(id TokenID) string {
+	return tokens[uint16(id)]
 }
-
-func (t tokens) Get(id TokenID) string {
-	return t.m[id]
-}
-
-func (t tokens) Lookup(id TokenID) (string, bool) {
-	token, ok := t.m[id]
-	return token, ok
-}
-
-var Tokens tokens
 
 func init() {
-	Tokens.m = parseTokens(tokensData)
+	m, err := tokenmap.Decode(strings.NewReader(tokensData))
+	if err != nil {
+		panic(err)
+	}
+	tokens = m
 }
+
+var tokens map[uint16]string
 
 //go:embed tokens
 var tokensData string
-
-func parseTokens(data string) map[TokenID]string {
-	length, data := readUint16(data)
-	m := make(map[TokenID]string, length)
-	var id uint16
-	var token string
-	for len(data) > 0 {
-		id, data = readUint16(data)
-		token, data = readString(data)
-		m[TokenID(id)] = token
-	}
-	return m
-}
-
-func readUint16(data string) (uint16, string) {
-	v := binary.LittleEndian.Uint16([]byte(data))
-	return v, data[2:]
-}
-
-func readString(data string) (string, string) {
-	length, data := data[0], data[1:]
-	return data[:length], data[length:]
-}
