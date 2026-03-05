@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Antoni Szymański
+// SPDX-License-Identifier: MPL-2.0
+
 package tokenmap
 
 import (
