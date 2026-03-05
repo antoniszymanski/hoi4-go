@@ -85,12 +85,11 @@ func Decode(r io.Reader) (map[uint16]string, error) {
 		valueLen, err := binary.ReadUvarint(br)
 		if err != nil {
 			return nil, err
-		}
-		if uint64(len(allValues)) < valueLen {
+		} else if uint64(len(allValues)) < valueLen {
 			return nil, errors.New("value length exceeds remaining buffer capacity")
 		}
-		var valueBuf []byte
-		valueBuf, allValues = allValues[:valueLen], allValues[valueLen:]
+		valueBuf := allValues[:valueLen]
+		allValues = allValues[valueLen:]
 		if _, err := io.ReadFull(br, valueBuf); err != nil {
 			return nil, err
 		}
