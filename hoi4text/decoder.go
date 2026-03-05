@@ -6,7 +6,7 @@ package hoi4text
 import "io"
 
 type decoderState struct {
-	r     *BufferedReader
+	r     BufferedReader
 	depth uint
 	mode  uint8
 }
@@ -70,10 +70,11 @@ type Decoder struct {
 }
 
 func NewDecoder(r io.Reader) (*Decoder, error) {
-	br, err := NewBufferedReader(r)
+	tr, err := NewReader(r)
 	if err != nil {
 		return nil, err
 	}
+	br := BufferedReader{r: tr}
 	return &Decoder{s: &decoderState{r: br}}, nil
 }
 
