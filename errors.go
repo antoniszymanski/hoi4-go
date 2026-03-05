@@ -125,3 +125,19 @@ type InvalidObjectKeyError struct {
 func (e *InvalidObjectKeyError) Error() string {
 	return fmt.Sprintf("token %v is not a object key", e.Token.ID())
 }
+
+type PeekKindError struct {
+	Err error
+}
+
+func (e *PeekKindError) Error() string {
+	return fmt.Sprintf("failed to peek kind: %v", e.Err)
+}
+
+type InvalidRootTypeError struct {
+	Type reflect.Type
+}
+
+func (e *InvalidRootTypeError) Error() string {
+	return fmt.Sprintf("cannot unmarshal root into Go value of type %v", e.Type)
+}

@@ -3,64 +3,34 @@
 
 package hoi4text
 
-import "io"
+import (
+	"io"
+)
 
 type decoderState struct {
 	r     BufferedReader
 	depth uint
-	mode  uint8
 }
 
 func (d *decoderState) ReadToken() (Token, error) {
-	var t Token
-	var err error
-	switch d.mode {
-	case 0:
-		t = ID(TokenOpen)
-		d.mode = 1
-	case 1:
-		t, err = d.r.ReadToken()
-		if err == io.EOF {
-			t = ID(TokenClose)
-			err = nil
-			d.mode = 2
-		}
-	case 2:
-		err = io.EOF
-	}
-	switch t.ID() {
-	case TokenOpen:
-		d.depth++
-	case TokenClose:
-		d.depth--
-	}
+	t, err := d.r.ReadToken()
+	d.updateDepth(t.ID())
 	return t, err
 }
 
 func (d *decoderState) SkipToken() (TokenID, error) {
-	var id TokenID
-	var err error
-	switch d.mode {
-	case 0:
-		id = TokenOpen
-		d.mode = 1
-	case 1:
-		id, err = d.r.SkipToken()
-		if err == io.EOF {
-			id = TokenClose
-			err = nil
-			d.mode = 2
-		}
-	case 2:
-		err = io.EOF
-	}
+	id, err := d.r.SkipToken()
+	d.updateDepth(id)
+	return id, err
+}
+
+func (d *decoderState) updateDepth(id TokenID) {
 	switch id {
 	case TokenOpen:
 		d.depth++
 	case TokenClose:
 		d.depth--
 	}
-	return id, err
 }
 
 type Decoder struct {
@@ -183,4 +153,21 @@ func (d *Decoder) Peek() *Peek {
 
 func (d *Decoder) PeekKind() (Kind, error) {
 	return d.s.r.PeekKind()
+}
+
+func (d *Decoder) IsEndOfContainer() error {
+	p := d.Peek()
+	id, err := p.SkipToken()
+	p.Close()
+	switch {
+	case err != nil:
+		return err
+	case id == TokenClose && d.s.depth == d.minDepth:
+		d.s.r.buf = d.s.r.buf[:len(d.s.r.buf)-1]
+		d.s.depth--
+		d.endOfContainer = true
+		return ErrEndOfContainer
+	default:
+		return nil
+	}
 }

@@ -58,6 +58,9 @@ func (br *BufferedReader) SkipToken() (TokenID, error) {
 }
 
 func (br *BufferedReader) PeekKind() (Kind, error) {
+	if br.offset == 0 {
+		return KindRoot, nil
+	}
 	p := br.Peek()
 	defer p.Close()
 	if id, err := p.SkipToken(); err != nil {
@@ -87,6 +90,7 @@ type Kind uint8
 
 const (
 	KindInvalid Kind = iota
+	KindRoot
 	KindScalar
 	KindEmptyContainer
 	KindArray
@@ -95,6 +99,8 @@ const (
 
 func (k Kind) String() string {
 	switch k {
+	case KindRoot:
+		return "root"
 	case KindScalar:
 		return "scalar"
 	case KindEmptyContainer:

@@ -7,11 +7,11 @@ import "github.com/antoniszymanski/hoi4-go/hoi4text"
 
 type Value []hoi4text.Token
 
-func (v *Value) UnmarshalHOI4(dec *hoi4text.Decoder) error {
-	x, err := dec.ReadValue(nil)
-	if err != nil {
-		return err
+func (v *Value) UnmarshalHOI4(dec *hoi4text.Decoder) (err error) {
+	if dec.Offset() == 0 {
+		*v, err = dec.ReadAll((*v)[:0])
+	} else {
+		*v, err = dec.ReadValue((*v)[:0])
 	}
-	*v = x
-	return nil
+	return
 }
