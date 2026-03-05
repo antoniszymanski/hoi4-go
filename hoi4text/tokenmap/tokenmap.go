@@ -27,6 +27,9 @@ func Encode(w io.Writer, m map[uint16]string) (n int, err error) {
 		binary.LittleEndian.PutUint16(writeBuf[:], x)
 		return write(writeBuf[:2])
 	}
+	writeString := func(s string) error {
+		return write(unsafe.Slice(unsafe.StringData(s), len(s)))
+	}
 	var allValuesLen uint64
 	for key, value := range m {
 		if value == "" {
@@ -52,7 +55,7 @@ func Encode(w io.Writer, m map[uint16]string) (n int, err error) {
 		if err = writeUvarint(uint64(len(value))); err != nil {
 			return
 		}
-		if err = write([]byte(value)); err != nil {
+		if err = writeString(value); err != nil {
 			return
 		}
 	}
