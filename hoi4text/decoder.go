@@ -156,6 +156,9 @@ func (d *Decoder) PeekKind() (Kind, error) {
 }
 
 func (d *Decoder) IsEndOfContainer() error {
+	if d.endOfContainer {
+		return ErrEndOfContainer
+	}
 	p := d.Peek()
 	id, err := p.SkipToken()
 	p.Close()
