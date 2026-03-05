@@ -13,14 +13,19 @@ import (
 
 func Encode(w io.Writer, m map[uint16]string) (n int, err error) {
 	fw, _ := flate.NewWriter(w, flate.BestCompression)
-	var writeBuf [binary.MaxVarintLen64]byte
-	writeUvarint := func(x uint64) (n int, err error) {
-		i := binary.PutUvarint(writeBuf[:], x)
-		return fw.Write(writeBuf[:i])
+	write := func(b []byte) error {
+		written, writeErr := fw.Write(b)
+		n += written
+		return writeErr
 	}
-	writeUint16 := func(x uint16) (n int, err error) {
+	var writeBuf [binary.MaxVarintLen64]byte
+	writeUvarint := func(x uint64) error {
+		i := binary.PutUvarint(writeBuf[:], x)
+		return write(writeBuf[:i])
+	}
+	writeUint16 := func(x uint16) error {
 		binary.LittleEndian.PutUint16(writeBuf[:], x)
-		return fw.Write(writeBuf[:2])
+		return write(writeBuf[:2])
 	}
 	var allValuesLen uint64
 	for key, value := range m {
@@ -30,24 +35,24 @@ func Encode(w io.Writer, m map[uint16]string) (n int, err error) {
 		}
 		allValuesLen += uint64(len(value))
 	}
-	if n, err = writeUvarint(allValuesLen); err != nil {
+	if err = writeUvarint(allValuesLen); err != nil {
 		return
 	}
 	keys := make([]uint16, 0, len(m))
 	keys = slices.AppendSeq(keys, maps.Keys(m))
 	slices.Sort(keys)
-	if n, err = writeUvarint(uint64(len(keys))); err != nil {
+	if err = writeUvarint(uint64(len(keys))); err != nil {
 		return
 	}
 	for _, key := range keys {
 		value := m[key]
-		if n, err = writeUint16(key); err != nil {
+		if err = writeUint16(key); err != nil {
 			return
 		}
-		if n, err = writeUvarint(uint64(len(value))); err != nil {
+		if err = writeUvarint(uint64(len(value))); err != nil {
 			return
 		}
-		if n, err = fw.Write([]byte(value)); err != nil {
+		if err = write([]byte(value)); err != nil {
 			return
 		}
 	}
