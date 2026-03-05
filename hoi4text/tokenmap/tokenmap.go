@@ -31,10 +31,9 @@ func Encode(w io.Writer, m map[uint16]string) (n int, err error) {
 		return write(unsafe.Slice(unsafe.StringData(s), len(s)))
 	}
 	var allValuesLen uint64
-	for key, value := range m {
+	for _, value := range m {
 		if value == "" {
-			delete(m, key)
-			continue
+			return 0, errors.New("token value cannot be empty")
 		}
 		allValuesLen += uint64(len(value))
 	}
