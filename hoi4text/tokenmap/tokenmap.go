@@ -18,13 +18,13 @@ func Encode(w io.Writer, m map[uint16]string) (n int, err error) {
 		n += written
 		return writeErr
 	}
-	var writeBuf [binary.MaxVarintLen64]byte
+	writeBuf := make([]byte, binary.MaxVarintLen64)
 	writeUvarint := func(x uint64) error {
-		i := binary.PutUvarint(writeBuf[:], x)
+		i := binary.PutUvarint(writeBuf, x)
 		return write(writeBuf[:i])
 	}
 	writeUint16 := func(x uint16) error {
-		binary.LittleEndian.PutUint16(writeBuf[:], x)
+		binary.LittleEndian.PutUint16(writeBuf, x)
 		return write(writeBuf[:2])
 	}
 	writeString := func(s string) error {
