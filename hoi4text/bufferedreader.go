@@ -35,10 +35,10 @@ func (br *BufferedReader) Offset() uint64 {
 
 func (br *BufferedReader) ReadToken() (Token, error) {
 	if len(br.buf) > 0 {
-		b := br.buf[len(br.buf)-1]
+		last := br.buf[len(br.buf)-1]
 		br.buf = br.buf[:len(br.buf)-1]
-		br.offset = b.offset
-		return b.token, b.err
+		br.offset = last.offset
+		return last.token, last.err
 	}
 	t, err := br.r.ReadToken()
 	br.offset = br.r.Offset()
@@ -47,10 +47,10 @@ func (br *BufferedReader) ReadToken() (Token, error) {
 
 func (br *BufferedReader) SkipToken() (TokenID, error) {
 	if len(br.buf) > 0 {
-		b := br.buf[len(br.buf)-1]
+		last := br.buf[len(br.buf)-1]
 		br.buf = br.buf[:len(br.buf)-1]
-		br.offset = b.offset
-		return b.token.ID(), b.err
+		br.offset = last.offset
+		return last.token.ID(), last.err
 	}
 	id, err := SkipToken(br.r)
 	br.offset = br.r.Offset()
