@@ -147,30 +147,28 @@ func (d *Decoder) EnterContainer() (*Decoder, error) {
 	return &Decoder{s: d.s, minDepth: d.Depth()}, nil
 }
 
+func (d *Decoder) IsEndOfContainer() error {
+	if d.endOfContainer {
+		return ErrEndOfContainer
+	}
+	t, err := d.s.r.ReadToken()
+	if t.ID() == TokenClose && d.s.depth == d.minDepth {
+		d.s.depth--
+		d.endOfContainer = true
+		return ErrEndOfContainer
+	}
+	d.s.r.buf = append(d.s.r.buf, bufferedToken{
+		token:  t,
+		err:    err,
+		offset: d.s.r.Offset(),
+	})
+	return err
+}
+
 func (d *Decoder) Peek() *Peek {
 	return d.s.r.Peek()
 }
 
 func (d *Decoder) PeekKind() (Kind, error) {
 	return d.s.r.PeekKind()
-}
-
-func (d *Decoder) IsEndOfContainer() error {
-	if d.endOfContainer {
-		return ErrEndOfContainer
-	}
-	p := d.Peek()
-	id, err := p.SkipToken()
-	p.Close()
-	switch {
-	case err != nil:
-		return err
-	case id == TokenClose && d.s.depth == d.minDepth:
-		d.s.r.buf = d.s.r.buf[:len(d.s.r.buf)-1]
-		d.s.depth--
-		d.endOfContainer = true
-		return ErrEndOfContainer
-	default:
-		return nil
-	}
 }
