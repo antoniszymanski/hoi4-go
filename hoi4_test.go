@@ -69,6 +69,15 @@ func test[T any](t *testing.T, expected, actual T) {
 }
 
 func Benchmark(b *testing.B) {
+	benchmark[Save](b)
+}
+
+func BenchmarkAny(b *testing.B) {
+	benchmark[any](b)
+}
+
+func benchmark[T any](b *testing.B) {
+	b.Helper()
 	in, err := savefile()
 	if err != nil {
 		b.Fatal(err)
@@ -76,7 +85,7 @@ func Benchmark(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 	for b.Loop() {
-		var out Save
+		var out T
 		if err := hoi4.Unmarshal(in, &out); err != nil {
 			b.Fatal(err)
 		}
