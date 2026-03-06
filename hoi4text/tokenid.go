@@ -59,8 +59,8 @@ var (
 	_ fmt.GoStringer = TokenID(0)
 )
 
-func (t TokenID) GoString() string {
-	return "hoi4text.TokenID(" + t.String() + ")"
+func (id TokenID) GoString() string {
+	return "hoi4text.TokenID(" + id.String() + ")"
 }
 
 func (id TokenID) String() string {
