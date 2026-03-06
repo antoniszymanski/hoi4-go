@@ -15,11 +15,11 @@ func GetToken(id TokenID) string {
 }
 
 func init() {
-	m, err := tokenmap.Decode(strings.NewReader(tokensData))
+	var err error
+	tokens, err = tokenmap.Decode(strings.NewReader(tokensData))
 	if err != nil {
 		panic(err)
 	}
-	tokens = m
 }
 
 var tokens map[uint16]string
