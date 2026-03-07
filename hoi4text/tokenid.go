@@ -92,7 +92,7 @@ func (id TokenID) String() string {
 	case TokenI64:
 		return "i64"
 	default:
-		if text := GetToken(id); text != "" {
+		if text := LookupToken(id); text != "" {
 			return text
 		}
 		return "<unknown: " + strconv.FormatUint(uint64(id), 10) + ">"
