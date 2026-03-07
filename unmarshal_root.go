@@ -19,17 +19,11 @@ func unmarshalRoot(dec *hoi4text.Decoder, out reflect.Value) error {
 	}
 	switch out.Kind() {
 	case reflect.Interface:
-		if out.IsNil() {
-			return ErrNilInterface
-		}
-		return unmarshalRoot(dec, out.Elem())
+		return unmarshalRootInterface(dec, out)
 	case reflect.Map:
 		return unmarshalRootMap(dec, out)
 	case reflect.Pointer:
-		if out.IsNil() {
-			out.Set(reflect.New(out.Type().Elem()))
-		}
-		return unmarshalRoot(dec, out.Elem())
+		return unmarshalRootPointer(dec, out)
 	case reflect.Struct:
 		return unmarshalRootStruct(dec, out)
 	default:
@@ -37,11 +31,25 @@ func unmarshalRoot(dec *hoi4text.Decoder, out reflect.Value) error {
 	}
 }
 
+func unmarshalRootInterface(dec *hoi4text.Decoder, out reflect.Value) error {
+	if out.IsNil() {
+		return ErrNilInterface
+	}
+	return unmarshalRoot(dec, out.Elem())
+}
+
 func unmarshalRootMap(dec *hoi4text.Decoder, out reflect.Value) error {
 	if err := unmarshalMapContent(dec, out); err != io.EOF {
 		return err
 	}
 	return nil
+}
+
+func unmarshalRootPointer(dec *hoi4text.Decoder, out reflect.Value) error {
+	if out.IsNil() {
+		out.Set(reflect.New(out.Type().Elem()))
+	}
+	return unmarshalRoot(dec, out.Elem())
 }
 
 func unmarshalRootStruct(dec *hoi4text.Decoder, out reflect.Value) error {
