@@ -141,3 +141,11 @@ type InvalidRootTypeError struct {
 func (e *InvalidRootTypeError) Error() string {
 	return fmt.Sprintf("cannot unmarshal root into Go value of type %v", e.Type)
 }
+
+type InvalidScalarError struct {
+	Token hoi4text.Token
+}
+
+func (e *InvalidScalarError) Error() string {
+	return fmt.Sprintf("token %v is not a scalar", e.Token.ID())
+}

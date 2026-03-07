@@ -4,7 +4,6 @@
 package hoi4
 
 import (
-	"fmt"
 	"io"
 	"reflect"
 
@@ -68,7 +67,7 @@ func unmarshalAnyScalar(dec *hoi4text.Decoder, out reflect.Value) error {
 	var x any
 	switch t.ID() {
 	case hoi4text.TokenOpen, hoi4text.TokenClose, hoi4text.TokenEqual:
-		panic(fmt.Errorf("unreachable: %v", t))
+		return &InvalidScalarError{t}
 	case hoi4text.TokenU32:
 		x = t.U32()
 	case hoi4text.TokenU64:
