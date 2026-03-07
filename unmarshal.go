@@ -34,17 +34,11 @@ func unmarshal(dec *hoi4text.Decoder, out reflect.Value) error {
 	case reflect.Float32, reflect.Float64:
 		return unmarshalFloat(dec, out)
 	case reflect.Interface:
-		if out.IsNil() {
-			return ErrNilInterface
-		}
-		return unmarshal(dec, out.Elem())
+		return unmarshalInterface(dec, out)
 	case reflect.Map:
 		return unmarshalMap(dec, out)
 	case reflect.Pointer:
-		if out.IsNil() {
-			out.Set(reflect.New(out.Type().Elem()))
-		}
-		return unmarshal(dec, out.Elem())
+		return unmarshalPointer(dec, out)
 	case reflect.Slice:
 		return unmarshalSlice(dec, out)
 	case reflect.String:
@@ -190,6 +184,13 @@ func unmarshalFloat(dec *hoi4text.Decoder, out reflect.Value) error {
 	return nil
 }
 
+func unmarshalInterface(dec *hoi4text.Decoder, out reflect.Value) error {
+	if out.IsNil() {
+		return ErrNilInterface
+	}
+	return unmarshal(dec, out.Elem())
+}
+
 func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 	dec, err := dec.EnterContainer()
 	if err != nil {
@@ -223,6 +224,13 @@ func unmarshalMapContent(dec *hoi4text.Decoder, out reflect.Value) error {
 		}
 		out.SetMapIndex(keyPtr.Elem(), elemPtr.Elem())
 	}
+}
+
+func unmarshalPointer(dec *hoi4text.Decoder, out reflect.Value) error {
+	if out.IsNil() {
+		out.Set(reflect.New(out.Type().Elem()))
+	}
+	return unmarshal(dec, out.Elem())
 }
 
 func unmarshalSlice(dec *hoi4text.Decoder, out reflect.Value) error {
