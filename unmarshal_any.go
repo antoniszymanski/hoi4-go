@@ -95,14 +95,14 @@ func unmarshalAnyScalar(dec *hoi4text.Decoder, out reflect.Value) error {
 
 func unmarshalAnyEmptyContainer(dec *hoi4text.Decoder, out reflect.Value) error {
 	if id, err := dec.SkipToken(); err != nil {
-		panic(err)
+		return err
 	} else if id != hoi4text.TokenOpen {
-		panic(1)
+		return &InvalidEmptyContainerError{id, FirstTokenOfEmptyContainer}
 	}
 	if id, err := dec.SkipToken(); err != nil {
-		panic(err)
+		return err
 	} else if id != hoi4text.TokenClose {
-		panic(2)
+		return &InvalidEmptyContainerError{id, LastTokenOfEmptyContainer}
 	}
 	out.Set(reflect.ValueOf(struct{}{}))
 	return nil

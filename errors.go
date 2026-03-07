@@ -149,3 +149,24 @@ type InvalidScalarError struct {
 func (e *InvalidScalarError) Error() string {
 	return fmt.Sprintf("token %v is not a scalar", e.Token.ID())
 }
+
+type InvalidEmptyContainerError struct {
+	TokenID hoi4text.TokenID
+	Where   Where
+}
+
+func (e *InvalidEmptyContainerError) Error() string {
+	var dst []byte
+	dst = append(dst, "unexpected token "...)
+	dst = append(dst, e.TokenID.String()...)
+	dst = append(dst, " at "...)
+	dst = append(dst, e.Where...)
+	return string(dst)
+}
+
+type Where string
+
+const (
+	FirstTokenOfEmptyContainer Where = "the first token of an empty container"
+	LastTokenOfEmptyContainer  Where = "the last token of an empty container"
+)
