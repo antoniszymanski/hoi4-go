@@ -10,7 +10,7 @@ import (
 	"github.com/antoniszymanski/hoi4-go/hoi4text/tokenmap"
 )
 
-func LookupToken(id TokenID) string {
+func ResolveToken(id TokenID) string {
 	return tokens[uint16(id)]
 }
 
