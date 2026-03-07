@@ -196,18 +196,15 @@ func unmarshalMap(dec *hoi4text.Decoder, out reflect.Value) error {
 	if err != nil {
 		return &EnterContainerError{err}
 	}
-	if err := unmarshalMapContent(dec, out); err != hoi4text.ErrEndOfContainer {
-		return err
-	}
-	return nil
+	return unmarshalMapContent(dec, out, hoi4text.ErrEndOfContainer)
 }
 
-func unmarshalMapContent(dec *hoi4text.Decoder, out reflect.Value) error {
+func unmarshalMapContent(dec *hoi4text.Decoder, out reflect.Value, stopErr error) (err error) {
 	typ := out.Type()
 	out.Set(reflect.MakeMap(typ))
 	for {
-		if err := dec.IsEndOfContainer(); err != nil {
-			return err
+		if err = dec.IsEndOfContainer(); err != nil {
+			break
 		}
 		keyPtr := reflect.New(typ.Key())
 		if err := unmarshal(dec, keyPtr); err != nil {
@@ -224,6 +221,10 @@ func unmarshalMapContent(dec *hoi4text.Decoder, out reflect.Value) error {
 		}
 		out.SetMapIndex(keyPtr.Elem(), elemPtr.Elem())
 	}
+	if err != stopErr {
+		return err
+	}
+	return nil
 }
 
 func unmarshalPointer(dec *hoi4text.Decoder, out reflect.Value) error {

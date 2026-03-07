@@ -39,10 +39,7 @@ func unmarshalRootInterface(dec *hoi4text.Decoder, out reflect.Value) error {
 }
 
 func unmarshalRootMap(dec *hoi4text.Decoder, out reflect.Value) error {
-	if err := unmarshalMapContent(dec, out); err != io.EOF {
-		return err
-	}
-	return nil
+	return unmarshalMapContent(dec, out, io.EOF)
 }
 
 func unmarshalRootPointer(dec *hoi4text.Decoder, out reflect.Value) error {
