@@ -50,8 +50,5 @@ func unmarshalRootPointer(dec *hoi4text.Decoder, out reflect.Value) error {
 }
 
 func unmarshalRootStruct(dec *hoi4text.Decoder, out reflect.Value) error {
-	if err := unmarshalStructContent(dec, out); err != io.EOF {
-		return err
-	}
-	return nil
+	return unmarshalStructContent(dec, out, io.EOF)
 }

@@ -285,20 +285,17 @@ func unmarshalStruct(dec *hoi4text.Decoder, out reflect.Value) error {
 	if err != nil {
 		return &EnterContainerError{err}
 	}
-	if err := unmarshalStructContent(dec, out); err != hoi4text.ErrEndOfContainer {
-		return err
-	}
-	return nil
+	return unmarshalStructContent(dec, out, hoi4text.ErrEndOfContainer)
 }
 
-func unmarshalStructContent(dec *hoi4text.Decoder, out reflect.Value) error {
+func unmarshalStructContent(dec *hoi4text.Decoder, out reflect.Value, stopErr error) error {
 	fieldIndices, err := fieldIndices(out.Type())
 	if err != nil {
 		return err
 	}
 	for {
-		if err := dec.IsEndOfContainer(); err != nil {
-			return err
+		if err = dec.IsEndOfContainer(); err != nil {
+			break
 		}
 		var key string
 		if err := unmarshalObjectKey(dec, &key); err != nil {
@@ -320,6 +317,10 @@ func unmarshalStructContent(dec *hoi4text.Decoder, out reflect.Value) error {
 			}
 		}
 	}
+	if err != stopErr {
+		return err
+	}
+	return nil
 }
 
 func fieldIndices(typ reflect.Type) (m map[string][]int, err error) {
