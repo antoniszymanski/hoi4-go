@@ -3,9 +3,7 @@
 
 package hoi4text
 
-import (
-	"io"
-)
+import "io"
 
 type decoderState struct {
 	r     BufferedReader
