@@ -114,19 +114,19 @@ func (k Kind) String() string {
 	}
 }
 
-func (br *BufferedReader) Peek() *Peek {
-	return &Peek{br}
+func (br *BufferedReader) Peek() Peek {
+	return Peek{br}
 }
 
 type Peek struct {
 	br *BufferedReader
 }
 
-func (p *Peek) Offset() uint64 {
+func (p Peek) Offset() uint64 {
 	return p.br.offset
 }
 
-func (p *Peek) ReadToken() (Token, error) {
+func (p Peek) ReadToken() (Token, error) {
 	t, err := p.br.ReadToken()
 	p.br.peekBuf = append(p.br.peekBuf, bufferedToken{
 		token:  t,
@@ -136,12 +136,12 @@ func (p *Peek) ReadToken() (Token, error) {
 	return t, err
 }
 
-func (p *Peek) SkipToken() (TokenID, error) {
+func (p Peek) SkipToken() (TokenID, error) {
 	t, err := p.ReadToken()
 	return t.ID(), err
 }
 
-func (p *Peek) Close() {
+func (p Peek) Close() {
 	slices.Reverse(p.br.peekBuf)
 	p.br.buf = append(p.br.buf, p.br.peekBuf...)
 	p.br.peekBuf = p.br.peekBuf[:0]

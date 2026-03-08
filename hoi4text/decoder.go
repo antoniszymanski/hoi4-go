@@ -163,7 +163,7 @@ func (d *Decoder) IsEndOfContainer() error {
 	return err
 }
 
-func (d *Decoder) Peek() *Peek {
+func (d *Decoder) Peek() Peek {
 	return d.s.r.Peek()
 }
 
