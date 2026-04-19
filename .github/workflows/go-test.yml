@@ -23,4 +23,4 @@ jobs:
           go-version-file: go.mod
 
       - name: Run tests
-        uses: robherley/go-test-action@v0
+        uses: robherley/go-test-action@v1
