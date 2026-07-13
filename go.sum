@@ -1,5 +1,5 @@
-github.com/alecthomas/repr v0.5.2 h1:SU73FTI9D1P5UNtvseffFSGmdNci/O6RsqzeXJtP0Qs=
-github.com/alecthomas/repr v0.5.2/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
+github.com/alecthomas/repr v0.5.3 h1:Ebk3yZ0kvrHC7TkTHLDJGDq1LxKeu9sQBQREFMcesS8=
+github.com/alecthomas/repr v0.5.3/go.mod h1:Fr0507jx4eOXV7AlPV6AVZLYrLIuIeSOWtW57eE/O/4=
 github.com/antoniszymanski/checked-go v0.1.0 h1:R98BeKPLxyUGAlRBq+3aAbWRtOQzOu1TDT89kXHqi34=
 github.com/antoniszymanski/checked-go v0.1.0/go.mod h1:a7YBGPLpg6+UTn/u4Wovfj9XKcq3mdc+PnockOiNwXU=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
