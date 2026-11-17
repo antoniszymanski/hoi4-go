@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/alecthomas/repr v0.5.4
 	github.com/antoniszymanski/checked-go v0.1.0
-	github.com/sergi/go-diff v1.4.0
+	github.com/sergi/go-diff v1.4.4
 )
 
 require github.com/stretchr/testify v1.11.1 // indirect
